@@ -1,0 +1,59 @@
+<!doctype html>
+<head>
+    <title>Demo socket test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.js" ></script>
+</head>
+
+<body>
+    <div id="main">
+        <h1>Demo Socket IO</h1>
+    </div>
+
+    <script>
+        const socket=io("",{transports:['websocket']});
+        var locTimer=null;
+
+        socket.on('connect',()=>{
+                console.log('Client connected');
+                // socket.emit('notice',{name:"test test",age:32})
+                socket.emit('authenticate',
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7InVzZXJfaWQiOjEsInJvbGUiOiJhZG1pbiJ9LCJleHAiOjE2NjkyNjUxNzEsImlhdCI6MTY2NjY3MzE3MX0.gGGh7JBjs7Ebiz2cQsnwdVRgxfinsehtxXfHHjswuSM')
+        })
+        socket.on('test',(msg)=>console.log("test",msg));
+        socket.on('notice',(msg)=>console.log("notice",msg));
+        socket.on("authenticated",(msg)=>{
+            console.log('authenticated',msg)
+            if(locTimer!=null){
+                clearInterval(locTimer)
+            }
+            locTimer=setInterval(()=>{
+                socket.emit('UserUpdateLocation',{lat:10.7900422,lng:106.6623443})
+            },3000)
+        })
+
+        // if(locTimer!=null){
+        //      clearInterval(locTimer);
+        // }
+        // locTimer=setInterval(()=>{
+        //     socket.emit('test',"10")
+        // },3000)
+        //  socket.on('notice',(msg)=>console.log("notice",msg));
+        //   socket.on('authenticate',(msg)=>{
+        //     console.log("authenticate",msg);
+        //     if(locTimer!=null){
+        //         clearInterval(locTimer);
+        //     }
+        //     locTimer=setInterval(()=>{
+        //         socket.emit("UserUpdateLocation",{lat:10.7900422,lng:106.6623443})
+        //     },3000)
+        //   });
+
+        // socket.on('your_profile',(msg)=>console.log('your profile:',msg));
+        socket.on('authentication_failed',(msg)=>console.log('authentication_failed:',msg));
+        // //socket.on('your_profile',(msg)=>console.log('your profile:',msg));
+        socket.on('TopicUserLikeRestaurant',(msg)=>console.log('TopicUserLikeRestaurant:',msg));
+        socket.on('disconnect',()=>console.log('Socket is disconnected'));
+
+    </script>
+</body>
+</html>
