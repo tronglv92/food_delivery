@@ -22,8 +22,8 @@ func main() {
 	dsn := "food_delivery:19e5a718a54a9fe0559dfbce6908@tcp(127.0.0.1:3307)/food_delivery?charset=utf8mb4&parseTime=True&loc=Local"
 	s3BucketName := "g012345-food-delivery"
 	s3Region := "ap-southeast-1"
-	s3APIKey := "AKIAZDLBDNV4DS54J4LG"
-	s3SecretKey := "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"
+	s3APIKey := ""
+	s3SecretKey := ""
 	s3Domain := "https://d3s5ma63l4xcbq.cloudfront.net"
 	// PASSWORD SECRET KEY
 	secretKey := "dogsupercute"
