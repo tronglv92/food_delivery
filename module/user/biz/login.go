@@ -3,7 +3,8 @@ package userbiz
 import (
 	"context"
 	"food_delivery/common"
-	"food_delivery/component/tokenprovider"
+	"food_delivery/plugin/tokenprovider"
+
 	usermodel "food_delivery/module/user/model"
 )
 
@@ -32,7 +33,7 @@ func NewLoginBusiness(storeUser LoginStorage, tokenProvider tokenprovider.Provid
 // 3. Provider: issue JWT token for client
 // 3.1 Access token and refresh token
 // 4. Return tokens
-func (business *loginBusiness) Login(ctx context.Context, data *usermodel.UserLogin) (*tokenprovider.Token, error) {
+func (business *loginBusiness) Login(ctx context.Context, data *usermodel.UserLogin) (tokenprovider.Token, error) {
 	user, err := business.storeUser.FindUser(ctx, map[string]interface{}{"email": data.Email})
 
 	if err != nil {
@@ -45,9 +46,9 @@ func (business *loginBusiness) Login(ctx context.Context, data *usermodel.UserLo
 		return nil, usermodel.ErrUsernameOrPasswordInvalid
 	}
 
-	payload := tokenprovider.TokenPayload{
-		UserId: user.Id,
-		Role:   user.Role,
+	payload := &common.TokenPayload{
+		UID:   user.Id,
+		URole: user.Role,
 	}
 
 	accessToken, err := business.tokenProvider.Generate(payload, business.expiry)

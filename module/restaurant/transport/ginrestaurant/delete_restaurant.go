@@ -2,17 +2,18 @@ package ginrestaurant
 
 import (
 	"food_delivery/common"
-	"food_delivery/component/appctx"
 	restaurantbiz "food_delivery/module/restaurant/biz"
 	restaurantstorage "food_delivery/module/restaurant/storage"
 	"net/http"
 
+	goservice "github.com/200Lab-Education/go-sdk"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-func DeleteRestaurant(appCtx appctx.AppContext) gin.HandlerFunc {
+func DeleteRestaurant(sc goservice.ServiceContext) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		db := appCtx.GetMainDBConnection()
+		db := sc.MustGet(common.DBMain).(*gorm.DB)
 
 		requester := ctx.MustGet(common.CurrentUser).(common.Requester)
 		//id, err := strconv.Atoi(ctx.Param("id"))

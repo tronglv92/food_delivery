@@ -2,18 +2,20 @@ package ginrestaurant
 
 import (
 	"food_delivery/common"
-	"food_delivery/component/appctx"
 	restaurantbiz "food_delivery/module/restaurant/biz"
 	restaurantmodel "food_delivery/module/restaurant/model"
 	restaurantstorage "food_delivery/module/restaurant/storage"
 	"net/http"
 
+	goservice "github.com/200Lab-Education/go-sdk"
+	"gorm.io/gorm"
+
 	"github.com/gin-gonic/gin"
 )
 
-func CreateRestaurant(appctx appctx.AppContext) gin.HandlerFunc {
+func CreateRestaurant(sc goservice.ServiceContext) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		db := appctx.GetMainDBConnection()
+		db := sc.MustGet(common.DBMain).(*gorm.DB)
 		// arr := []int{}
 		// log.Println(arr[0])
 		requester := ctx.MustGet(common.CurrentUser).(common.Requester)

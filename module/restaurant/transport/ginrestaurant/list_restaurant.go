@@ -2,7 +2,6 @@ package ginrestaurant
 
 import (
 	"food_delivery/common"
-	"food_delivery/component/appctx"
 	restaurantbiz "food_delivery/module/restaurant/biz"
 	restaurantmodel "food_delivery/module/restaurant/model"
 	restaurantrepo "food_delivery/module/restaurant/repository"
@@ -10,12 +9,14 @@ import (
 	restaurantlikestorage "food_delivery/module/restaurantlike/storage"
 	"net/http"
 
+	goservice "github.com/200Lab-Education/go-sdk"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-func ListRestaurant(appCtx appctx.AppContext) gin.HandlerFunc {
+func ListRestaurant(sc goservice.ServiceContext) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		db := appCtx.GetMainDBConnection()
+		db := sc.MustGet(common.DBMain).(*gorm.DB)
 
 		var pagingData common.Paging
 
@@ -34,6 +35,8 @@ func ListRestaurant(appCtx appctx.AppContext) gin.HandlerFunc {
 
 		store := restaurantstorage.NewSQLStore(db)
 		likeStore := restaurantlikestorage.NewSQLStore(db)
+
+		// likeStore := grpcstore.NewGRPCClient(demo.NewRestaurantLikeServiceClient(appCtx.GetGRPCClientConnection()))
 
 		repo := restaurantrepo.NewListRestaurantRepo(store, likeStore)
 		biz := restaurantbiz.NewListRestaurantBiz(repo)

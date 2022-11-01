@@ -1,13 +1,7 @@
 package skio
 
 import (
-	"context"
-	"errors"
 	"fmt"
-
-	"food_delivery/component/tokenprovider/jwt"
-	userstore "food_delivery/module/user/store"
-	"food_delivery/module/user/transport/skuser"
 
 	"sync"
 
@@ -96,12 +90,12 @@ func (engine *rtEngine) EmitToUser(userId int, key string, data interface{}) err
 	return nil
 }
 func (engine *rtEngine) Run(appCtx AppContext, r *gin.Engine) error {
-	server, err := socketio.NewServer(&engineio.Options{
+	server := socketio.NewServer(&engineio.Options{
 		Transports: []transport.Transport{websocket.Default},
 	})
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 	engine.server = server
 
 	server.OnConnect("/", func(s socketio.Conn) error {
@@ -119,44 +113,44 @@ func (engine *rtEngine) Run(appCtx AppContext, r *gin.Engine) error {
 	})
 
 	server.OnEvent("/", "authenticate", func(s socketio.Conn, token string) {
-		db := appCtx.GetMainDBConnection()
-		store := userstore.NewSQLStore(db)
+		// db := appCtx.GetMainDBConnection()
+		// store := userstore.NewSQLStore(db)
 
-		tokenProvider := jwt.NewTokenJWTProvider(appCtx.SecretKey())
+		// tokenProvider := jwt.NewTokenJWTProvider(appCtx.SecretKey())
 
-		payload, err := tokenProvider.Validate(token)
-		if err != nil {
-			s.Emit("authentication_failed", err.Error())
-			s.Close()
-			return
-		}
-		user, err := store.FindUser(context.Background(), map[string]interface{}{"id": payload.UserId})
-
-		if err != nil {
-			s.Emit("authentication_failed", err.Error())
-			s.Close()
-			return
-		}
-
-		if user.Status == 0 {
-			s.Emit("authentication_failed", errors.New("you has been banned/deleted"))
-			s.Close()
-			return
-		}
-
-		user.Mask(false)
-
-		// Important: New AppSocket
-		appSck := NewAppSocket(s, user)
-		engine.saveAppSocket(user.Id, appSck)
-
-		s.Emit("authenticated", user)
-
-		// appSck.Join(user.GetRole()) // The same
-		// if user.GetRole() == "admin" {
-		// 	appSck.Join("admin")
+		// payload, err := tokenProvider.Validate(token)
+		// if err != nil {
+		// 	s.Emit("authentication_failed", err.Error())
+		// 	s.Close()
+		// 	return
 		// }
-		server.OnEvent("/", "UserUpdateLocation", skuser.OnUserUpdateLocation(appCtx, user))
+		// user, err := store.FindUser(context.Background(), map[string]interface{}{"id": payload.UID})
+
+		// if err != nil {
+		// 	s.Emit("authentication_failed", err.Error())
+		// 	s.Close()
+		// 	return
+		// }
+
+		// if user.Status == 0 {
+		// 	s.Emit("authentication_failed", errors.New("you has been banned/deleted"))
+		// 	s.Close()
+		// 	return
+		// }
+
+		// user.Mask(false)
+
+		// // Important: New AppSocket
+		// appSck := NewAppSocket(s, user)
+		// engine.saveAppSocket(user.Id, appSck)
+
+		// s.Emit("authenticated", user)
+
+		// // appSck.Join(user.GetRole()) // The same
+		// // if user.GetRole() == "admin" {
+		// // 	appSck.Join("admin")
+		// // }
+		// server.OnEvent("/", "UserUpdateLocation", skuser.OnUserUpdateLocation(appCtx, user))
 	})
 	go server.Serve()
 	r.GET("/socket.io/*any", gin.WrapH(server))

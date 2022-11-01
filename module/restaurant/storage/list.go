@@ -4,6 +4,8 @@ import (
 	"context"
 	"food_delivery/common"
 	restaurantmodel "food_delivery/module/restaurant/model"
+
+	"go.opencensus.io/trace"
 )
 
 func (s *sqlStore) ListDataWithCondition(
@@ -22,10 +24,12 @@ func (s *sqlStore) ListDataWithCondition(
 		}
 	}
 
+	_, span := trace.StartSpan(context, "store.restaurant.list.count")
 	if err := db.Count(&paging.Total).Error; err != nil {
+		span.End()
 		return nil, err
 	}
-
+	span.End()
 	for i := range moreKeys {
 		db = db.Preload(moreKeys[i])
 	}
@@ -41,6 +45,8 @@ func (s *sqlStore) ListDataWithCondition(
 		db = db.Offset(offset)
 	}
 
+	_, span = trace.StartSpan(context, "store.restaurant.list")
+	defer span.End()
 	if err := db.
 		Limit(paging.Limit).
 		Order("id desc").

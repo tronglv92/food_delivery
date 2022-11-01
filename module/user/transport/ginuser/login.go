@@ -2,18 +2,19 @@ package ginuser
 
 import (
 	"food_delivery/common"
-	"food_delivery/component/appctx"
 	"food_delivery/component/hasher"
-	"food_delivery/component/tokenprovider/jwt"
 	userbiz "food_delivery/module/user/biz"
 	usermodel "food_delivery/module/user/model"
 	userstore "food_delivery/module/user/store"
+	"food_delivery/plugin/tokenprovider"
 	"net/http"
 
+	goservice "github.com/200Lab-Education/go-sdk"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-func Login(appCtx appctx.AppContext) gin.HandlerFunc {
+func Login(sc goservice.ServiceContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var loginUserData usermodel.UserLogin
 
@@ -21,8 +22,8 @@ func Login(appCtx appctx.AppContext) gin.HandlerFunc {
 			panic(common.ErrInvalidRequest(err))
 		}
 
-		db := appCtx.GetMainDBConnection()
-		tokenProvider := jwt.NewTokenJWTProvider(appCtx.SecretKey())
+		db := sc.MustGet(common.DBMain).(*gorm.DB)
+		tokenProvider := sc.MustGet(common.JWTProvider).(tokenprovider.Provider)
 
 		store := userstore.NewSQLStore(db)
 		md5 := hasher.NewMd5Hash()

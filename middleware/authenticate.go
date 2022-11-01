@@ -1,16 +1,22 @@
 package middleware
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"food_delivery/common"
-	"food_delivery/component/appctx"
-	"food_delivery/component/tokenprovider/jwt"
-	userstore "food_delivery/module/user/store"
+	usermodel "food_delivery/module/user/model"
+	"food_delivery/plugin/tokenprovider"
 	"strings"
 
+	goservice "github.com/200Lab-Education/go-sdk"
 	"github.com/gin-gonic/gin"
+	"go.opencensus.io/trace"
 )
+
+type AuthenStore interface {
+	FindUser(ctx context.Context, conditions map[string]interface{}, moreInfo ...string) (*usermodel.User, error)
+}
 
 func ErrWrongAuthHeader(err error) *common.AppError {
 	return common.NewCustomError(
@@ -33,25 +39,27 @@ func extractTokenFromHeaderString(s string) (string, error) {
 // 1. Get Token from header
 // 2. Validate token and parse to payload
 // 3. From the token payload, we use user_id to find from DB
-func RequiredAuth(appCtx appctx.AppContext) func(c *gin.Context) {
-	tokenProvider := jwt.NewTokenJWTProvider(appCtx.SecretKey())
+func RequiredAuth(sc goservice.ServiceContext, authStore AuthenStore) func(c *gin.Context) {
+	tokenProvider := sc.MustGet(common.JWTProvider).(tokenprovider.Provider)
 
 	return func(c *gin.Context) {
+
 		token, err := extractTokenFromHeaderString(c.GetHeader("Authorization"))
 
 		if err != nil {
 			panic(err)
 		}
 
-		db := appCtx.GetMainDBConnection()
-		store := userstore.NewSQLStore(db)
+		// db := appCtx.GetMainDBConnection()
+		// store := userstore.NewSQLStore(db)
 
 		payload, err := tokenProvider.Validate(token)
 		if err != nil {
 			panic(err)
 		}
-
-		user, err := store.FindUser(c.Request.Context(), map[string]interface{}{"id": payload.UserId})
+		ctx, span := trace.StartSpan(c.Request.Context(), "middleware.RequiredAuth")
+		user, err := authStore.FindUser(ctx, map[string]interface{}{"id": payload.UserId})
+		span.End()
 
 		if err != nil {
 			panic(err)

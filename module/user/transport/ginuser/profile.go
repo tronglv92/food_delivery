@@ -2,13 +2,13 @@ package ginuser
 
 import (
 	"food_delivery/common"
-	"food_delivery/component/appctx"
 	"net/http"
 
+	goservice "github.com/200Lab-Education/go-sdk"
 	"github.com/gin-gonic/gin"
 )
 
-func Profile(appCtx appctx.AppContext) gin.HandlerFunc {
+func Profile(sc goservice.ServiceContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		u := c.MustGet(common.CurrentUser).(common.Requester)
 

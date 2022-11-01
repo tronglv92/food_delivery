@@ -1,41 +1,35 @@
 package ginrstlike
 
 import (
-	"food_delivery/common"
-	"food_delivery/component/appctx"
-	rstlikebiz "food_delivery/module/restaurantlike/biz"
-	restaurantlikemodel "food_delivery/module/restaurantlike/model"
-	restaurantlikestorage "food_delivery/module/restaurantlike/storage"
-	"net/http"
-
+	goservice "github.com/200Lab-Education/go-sdk"
 	"github.com/gin-gonic/gin"
 )
 
 // /v1/restaurants/:id/like
-func UserLikeRestaurant(appCtx appctx.AppContext) gin.HandlerFunc {
+func UserLikeRestaurant(sc goservice.ServiceContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		uid, err := common.FromBase58(c.Param("id"))
+		// uid, err := common.FromBase58(c.Param("id"))
 
-		if err != nil {
-			panic(common.ErrInvalidRequest(err))
-		}
+		// if err != nil {
+		// 	panic(common.ErrInvalidRequest(err))
+		// }
 
-		requester := c.MustGet(common.CurrentUser).(common.Requester)
+		// requester := c.MustGet(common.CurrentUser).(common.Requester)
 
-		data := restaurantlikemodel.Like{
-			RestaurantId: int(uid.GetLocalID()),
-			UserId:       requester.GetUserId(),
-		}
+		// data := restaurantlikemodel.Like{
+		// 	RestaurantId: int(uid.GetLocalID()),
+		// 	UserId:       requester.GetUserId(),
+		// }
 
-		db := appCtx.GetMainDBConnection()
-		store := restaurantlikestorage.NewSQLStore(db)
-		// incStore := restaurantlikestorage.NewSQLStore(db)
+		// db := sc.MustGet(common.DBMain).(*gorm.DB)
+		// store := restaurantlikestorage.NewSQLStore(db)
+		// // incStore := restaurantlikestorage.NewSQLStore(db)
 
-		biz := rstlikebiz.NewUserLikeRestaurantBiz(store, appCtx.GetPubSub())
+		// biz := rstlikebiz.NewUserLikeRestaurantBiz(store, appCtx.GetPubSub())
 
-		if err := biz.LikeRestaurant(c.Request.Context(), &data); err != nil {
-			panic(err)
-		}
-		c.JSON(http.StatusOK, common.SimpleSuccessResponse(true))
+		// if err := biz.LikeRestaurant(c.Request.Context(), &data); err != nil {
+		// 	panic(err)
+		// }
+		// c.JSON(http.StatusOK, common.SimpleSuccessResponse(true))
 	}
 }
