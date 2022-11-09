@@ -1,0 +1,6 @@
+.idea
+go.sum
+app
+.DS_STORE
+vendor
+.env
