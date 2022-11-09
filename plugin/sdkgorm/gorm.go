@@ -8,7 +8,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/200Lab-Education/go-sdk/logger"
+	"food_delivery/plugin/go-sdk/logger"
+
 	"gorm.io/gorm"
 )
 

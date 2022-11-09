@@ -8,7 +8,8 @@ import (
 	userstorage "food_delivery/module/user/store"
 	"net/http"
 
-	goservice "github.com/200Lab-Education/go-sdk"
+	goservice "food_delivery/plugin/go-sdk"
+
 	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"

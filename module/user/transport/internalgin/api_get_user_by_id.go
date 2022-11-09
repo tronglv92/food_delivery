@@ -6,7 +6,8 @@ import (
 
 	userstorage "food_delivery/module/user/store"
 
-	goservice "github.com/200Lab-Education/go-sdk"
+	goservice "food_delivery/plugin/go-sdk"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )

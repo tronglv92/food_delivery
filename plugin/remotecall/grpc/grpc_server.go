@@ -6,7 +6,8 @@ import (
 	"food_delivery/common"
 	"net"
 
-	"github.com/200Lab-Education/go-sdk/logger"
+	"food_delivery/plugin/go-sdk/logger"
+
 	"google.golang.org/grpc"
 )
 

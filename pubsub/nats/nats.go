@@ -7,7 +7,8 @@ import (
 	"food_delivery/pubsub"
 	"time"
 
-	"github.com/200Lab-Education/go-sdk/logger"
+	"food_delivery/plugin/go-sdk/logger"
+
 	"github.com/nats-io/nats.go"
 )
 

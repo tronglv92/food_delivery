@@ -3,7 +3,7 @@ module food_delivery
 go 1.18
 
 require (
-	github.com/200Lab-Education/go-sdk v1.1.2
+	
 	github.com/ClickHouse/clickhouse-go v1.5.4
 	github.com/NaySoftware/go-fcm v0.0.0-20190516140123-808e978ddcd2
 	github.com/aws/aws-sdk-go v1.44.116

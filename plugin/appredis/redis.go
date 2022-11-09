@@ -4,7 +4,8 @@ import (
 	"context"
 	"flag"
 
-	"github.com/200Lab-Education/go-sdk/logger"
+	"food_delivery/plugin/go-sdk/logger"
+
 	"github.com/go-redis/redis/v8"
 )
 

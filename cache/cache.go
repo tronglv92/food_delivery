@@ -5,7 +5,7 @@ import (
 	"food_delivery/common"
 	"time"
 
-	goservice "github.com/200Lab-Education/go-sdk"
+	goservice "food_delivery/plugin/go-sdk"
 	"github.com/go-redis/cache/v8"
 	"github.com/go-redis/redis/v8"
 )

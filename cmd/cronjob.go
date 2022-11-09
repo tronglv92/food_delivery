@@ -3,7 +3,8 @@ package cmd
 import (
 	cronjob2 "food_delivery/plugin/cronjob"
 
-	goservice "github.com/200Lab-Education/go-sdk"
+	goservice "food_delivery/plugin/go-sdk"
+
 	"github.com/spf13/cobra"
 )
 

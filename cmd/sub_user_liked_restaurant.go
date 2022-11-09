@@ -11,7 +11,8 @@ import (
 
 	appnats "food_delivery/pubsub/nats"
 
-	goservice "github.com/200Lab-Education/go-sdk"
+	goservice "food_delivery/plugin/go-sdk"
+
 	"github.com/spf13/cobra"
 	"gorm.io/gorm"
 )

@@ -3,7 +3,7 @@ package cronjob
 import (
 	"time"
 
-	"github.com/200Lab-Education/go-sdk/logger"
+	"food_delivery/plugin/go-sdk/logger"
 )
 
 type myCronJob struct {

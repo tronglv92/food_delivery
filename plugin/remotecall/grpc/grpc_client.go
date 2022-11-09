@@ -6,7 +6,8 @@ import (
 	"food_delivery/common"
 	user "food_delivery/proto"
 
-	"github.com/200Lab-Education/go-sdk/logger"
+	"food_delivery/plugin/go-sdk/logger"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

@@ -3,7 +3,8 @@ package handlers
 import (
 	userinternal "food_delivery/module/user/transport/internalgin"
 
-	goservice "github.com/200Lab-Education/go-sdk"
+	goservice "food_delivery/plugin/go-sdk"
+
 	"github.com/gin-gonic/gin"
 )
 

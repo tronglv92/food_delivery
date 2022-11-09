@@ -7,7 +7,8 @@ import (
 	restaurantstorage "food_delivery/module/restaurant/storage"
 	"net/http"
 
-	goservice "github.com/200Lab-Education/go-sdk"
+	goservice "food_delivery/plugin/go-sdk"
+
 	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"
