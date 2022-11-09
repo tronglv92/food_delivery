@@ -89,7 +89,7 @@ func (s *sqlStore) GetUsersLikeRestaurant(ctx context.Context,
 
 	for i, item := range result {
 		result[i].User.CreatedAt = item.CreatedAt
-		result[i].User.UpdatedAt = nil
+		result[i].User.UpdateAt = nil
 		users[i] = *result[i].User
 
 		if i == len(result)-1 {

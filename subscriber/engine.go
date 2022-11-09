@@ -48,8 +48,8 @@ type GroupJob interface {
 	Run(ctx context.Context) error
 }
 
-func (engine *consumerEngine) startSubTopic(topic pubsub.Topic, isConcurrent bool, consumerJobs ...consumerJob) error {
-	c, _ := engine.appCtx.GetPubSub().Subcribe(context.Background(), topic)
+func (engine *consumerEngine) startSubTopic(topic string, isConcurrent bool, consumerJobs ...consumerJob) error {
+	c, _ := engine.appCtx.GetPubSub().Subscribe(context.Background(), topic)
 
 	for _, item := range consumerJobs {
 		log.Println("Setup consumer for: ", item.Title)

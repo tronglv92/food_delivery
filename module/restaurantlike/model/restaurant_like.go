@@ -36,3 +36,17 @@ func ErrCannotUnlikeRestaurant(err error) *common.AppError {
 		fmt.Sprintf("ErrCannotUnLikeRestaurant"),
 	)
 }
+func ErrUserAlreadyLikedRestaurant(err error) *common.AppError {
+	return common.NewCustomError(
+		err,
+		fmt.Sprintf("you've already liked this restaurant"),
+		fmt.Sprintf("ErrUserAlreadyLikedRestaurant"),
+	)
+}
+func ErrCannotDidNotlikeRestaurant(err error) *common.AppError {
+	return common.NewCustomError(
+		err,
+		fmt.Sprintf("You have not liked this restaurant"),
+		fmt.Sprintf("ErrCannotDidNotlikeRestaurant"),
+	)
+}

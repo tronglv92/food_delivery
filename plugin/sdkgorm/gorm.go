@@ -65,8 +65,8 @@ func (gdb *gormDB) InitFlags() {
 		prefix += "-"
 	}
 
-	flag.StringVar(&gdb.Uri, prefix+"gorm-db-uri", "food_delivery:19e5a718a54a9fe0559dfbce6908@tcp(127.0.0.1:3307)/food_delivery?charset=utf8mb4&parseTime=True&loc=Local", "Gorm database connection-string.")
-	flag.StringVar(&gdb.DBType, prefix+"gorm-db-type", "mysql", "Gorm database type (mysql, postgres, sqlite, mssql)")
+	flag.StringVar(&gdb.Uri, prefix+"gorm-db-uri", "", "Gorm database connection-string.")
+	flag.StringVar(&gdb.DBType, prefix+"gorm-db-type", "", "Gorm database type (mysql, postgres, sqlite, mssql)")
 	flag.IntVar(&gdb.PingInterval, prefix+"gorm-db-ping-interval", 5, "Gorm database ping check interval")
 }
 
@@ -141,10 +141,10 @@ func (gdb *gormDB) getDBConn(t GormDBType) (dbConn *gorm.DB, err error) {
 	switch t {
 	case GormDBTypeMySQL:
 		return gormdialects.MySqlDB(gdb.Uri)
-	// case GormDBTypePostgres:
-	// 	return gormdialects.PostgresDB(gdb.Uri)
-	// case GormDBTypeSQLite:
-	// 	return gormdialects.SQLiteDB(gdb.Uri)
+	case GormDBTypePostgres:
+		return gormdialects.PostgresDB(gdb.Uri)
+	case GormDBTypeSQLite:
+		return gormdialects.SQLiteDB(gdb.Uri)
 	case GormDBTypeMSSQL:
 		return gormdialects.MSSqlDB(gdb.Uri)
 	}

@@ -2,6 +2,8 @@ package jwt
 
 import (
 	"flag"
+	"fmt"
+	"food_delivery/common"
 	"food_delivery/plugin/tokenprovider"
 	"time"
 
@@ -29,17 +31,22 @@ func NewTokenJWTProvider(prefix string) *jwtProvider {
 }
 
 type myClaims struct {
-	Payload tokenprovider.TokenPayload `json:"payload"`
+	Payload common.TokenPayload `json:"payload"`
 	jwt.StandardClaims
 }
 
 func (j *jwtProvider) Generate(data tokenprovider.TokenPayload, expiry int) (tokenprovider.Token, error) {
 	// generate the JWT
+	now := time.Now()
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, myClaims{
-		data,
+		common.TokenPayload{
+			UID:   data.UserId(),
+			URole: data.Role(),
+		},
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Local().Add(time.Second * time.Duration(expiry)).Unix(),
 			IssuedAt:  time.Now().Local().Unix(),
+			Id:        fmt.Sprintf("%d", now.UnixNano()),
 		},
 	})
 

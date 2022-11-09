@@ -9,23 +9,26 @@ import (
 const EntityName = "restaurant"
 
 type Restaurant struct {
-	common.SQLModel `json:",inline"`
-	Name            string             `json:"name" gorm:"column:name;"`
-	Addr            string             `json:"addr" gorm:"column:addr;"`
-	Logo            *common.Image      `json:"logo" gorm:"column:logo;"`
-	Cover           *common.Images     `json:"cover" gorm:"column:cover;"`
-	UserId          int                `json:"-" gorm:"column:user_id"`
-	User            *common.SimpleUser `json:"user" gorm:"preload:false;"`
-	LikedCount      int                `json:"liked_count" gorm:"column:liked_count;"`
+	common.SQLModel
+	Name string `json:"name" gorm:"column:name;"`
+	Addr string `json:"addr" gorm:"column:addr;"`
+
+	UserId      int                `json:"-" gorm:"column:user_id"`
+	User        *common.SimpleUser `json:"user" gorm:"preload:false;"`
+	LikedCount  int                `json:"liked_count" gorm:"column:liked_count;"`
+	FakeOwnerId *common.UID        `json:"user_id" gorm:"-"`
 }
 
 func (Restaurant) TableName() string { return "restaurants" }
 
 func (r *Restaurant) Mask(isAdminOrOwner bool) {
-	r.GenUID(common.DbTypeRestaurant)
+	r.SQLModel.Mask(common.DbTypeRestaurant)
 
-	if u := r.User; u != nil {
-		u.Mask(isAdminOrOwner)
+	fakeOwnerId := common.NewUID(uint32(r.UserId), int(common.DbTypeUser), 1)
+	r.FakeOwnerId = &fakeOwnerId
+
+	if v := r.User; v != nil {
+		v.Mask(common.DbTypeUser)
 	}
 }
 
@@ -34,12 +37,6 @@ type RestaurantCreate struct {
 	Name            string           `json:"name" gorm:"column:name;"`
 	Addr            string           `json:"addr" gorm:"column:addr;"`
 	UserId          int              `json:"-" gorm:"column:user_id"`
-	Logo            *common.Image    `json:"logo" gorm:"column:logo;"`
-	Cover           *common.Images   `json:"cover" gorm:"column:cover;"`
-}
-
-func (data *RestaurantCreate) Mask(isAdminOrOwner bool) {
-	data.GenUID(common.DbTypeRestaurant)
 }
 
 func (data *RestaurantCreate) Validate() error {
@@ -53,10 +50,8 @@ func (data *RestaurantCreate) Validate() error {
 func (RestaurantCreate) TableName() string { return Restaurant{}.TableName() }
 
 type RestaurantUpdate struct {
-	Name  *string        `json:"name" gorm:"column:name;"`
-	Addr  *string        `json:"address" gorm:"column:addr;"`
-	Logo  *common.Image  `json:"logo" gorm:"column:logo;"`
-	Cover *common.Images `json:"cover" gorm:"column:cover;"`
+	Name *string `json:"name" gorm:"column:name;"`
+	Addr *string `json:"address" gorm:"column:addr;"`
 }
 
 func (RestaurantUpdate) TableName() string { return Restaurant{}.TableName() }

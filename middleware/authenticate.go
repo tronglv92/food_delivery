@@ -58,7 +58,7 @@ func RequiredAuth(sc goservice.ServiceContext, authStore AuthenStore) func(c *gi
 			panic(err)
 		}
 		ctx, span := trace.StartSpan(c.Request.Context(), "middleware.RequiredAuth")
-		user, err := authStore.FindUser(ctx, map[string]interface{}{"id": payload.UserId})
+		user, err := authStore.FindUser(ctx, map[string]interface{}{"id": payload.UserId()})
 		span.End()
 
 		if err != nil {
@@ -70,7 +70,7 @@ func RequiredAuth(sc goservice.ServiceContext, authStore AuthenStore) func(c *gi
 				errors.New("user has been deleted or banned")))
 		}
 
-		user.Mask(false)
+		user.Mask(common.DbTypeUser)
 
 		c.Set(common.CurrentUser, user)
 		c.Next()

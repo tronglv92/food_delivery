@@ -1,4 +1,4 @@
-package biz
+package restaurantbiz
 
 import (
 	"context"
@@ -7,22 +7,25 @@ import (
 )
 
 type DeleteRestaurantStore interface {
-	Delete(context context.Context, id int) error
-	FindDataWithCondition(
+	DeleteRestaurant(
+		ctx context.Context,
+		cond map[string]interface{},
+	) error
+	FindRestaurant(
 		context context.Context,
 		condition map[string]interface{},
 		moreKeys ...string) (*restaurantmodel.Restaurant, error)
 }
 type deleteRestaurantBiz struct {
-	store     DeleteRestaurantStore
-	requester common.Requester
+	store DeleteRestaurantStore
+	// requester common.Requester
 }
 
-func NewDeleteRestaurantBiz(store DeleteRestaurantStore, requester common.Requester) *deleteRestaurantBiz {
-	return &deleteRestaurantBiz{store: store, requester: requester}
+func NewDeleteRestaurantBiz(store DeleteRestaurantStore) *deleteRestaurantBiz {
+	return &deleteRestaurantBiz{store: store}
 }
 func (biz *deleteRestaurantBiz) DeleteRestaurant(context context.Context, id int) error {
-	oldData, err := biz.store.FindDataWithCondition(context, map[string]interface{}{"id": id})
+	oldData, err := biz.store.FindRestaurant(context, map[string]interface{}{"id": id})
 
 	if err != nil {
 		return common.ErrEntityNotFound(restaurantmodel.EntityName, err)
@@ -32,11 +35,11 @@ func (biz *deleteRestaurantBiz) DeleteRestaurant(context context.Context, id int
 		return common.ErrEntityDeleted(restaurantmodel.EntityName, nil)
 	}
 
-	if oldData.UserId != biz.requester.GetUserId() {
-		return common.ErrNoPermission(nil)
-	}
+	// if oldData.UserId != biz.requester.GetUserId() {
+	// 	return common.ErrNoPermission(nil)
+	// }
 
-	if err := biz.store.Delete(context, id); err != nil {
+	if err := biz.store.DeleteRestaurant(context, map[string]interface{}{"id": id}); err != nil {
 		return common.ErrCannotDeleteEntity(restaurantmodel.EntityName, nil)
 	}
 	return nil

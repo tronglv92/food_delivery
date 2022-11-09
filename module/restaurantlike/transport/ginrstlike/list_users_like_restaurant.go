@@ -2,16 +2,17 @@ package ginrstlike
 
 import (
 	"food_delivery/common"
-	"food_delivery/component/appctx"
 	rstlikebiz "food_delivery/module/restaurantlike/biz"
 	restaurantlikemodel "food_delivery/module/restaurantlike/model"
 	restaurantlikestorage "food_delivery/module/restaurantlike/storage"
 	"net/http"
 
+	goservice "github.com/200Lab-Education/go-sdk"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-func ListUser(appCtx appctx.AppContext) gin.HandlerFunc {
+func ListUser(sc goservice.ServiceContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		uid, err := common.FromBase58(c.Param("id"))
 
@@ -30,7 +31,8 @@ func ListUser(appCtx appctx.AppContext) gin.HandlerFunc {
 
 		paging.Fulfill()
 
-		store := restaurantlikestorage.NewSQLStore(appCtx.GetMainDBConnection())
+		db := sc.MustGet(common.DBMain).(*gorm.DB)
+		store := restaurantlikestorage.NewSQLStore(db)
 		biz := rstlikebiz.NewListUserLikeRestaurantBiz(store)
 
 		result, err := biz.ListUsers(c.Request.Context(), &filter, &paging)
@@ -39,7 +41,7 @@ func ListUser(appCtx appctx.AppContext) gin.HandlerFunc {
 			panic(err)
 		}
 		for i := range result {
-			result[i].Mask(false)
+			result[i].Mask(common.DbTypeUser)
 		}
 
 		c.JSON(http.StatusOK, common.NewSuccessResponse(result, paging, filter))

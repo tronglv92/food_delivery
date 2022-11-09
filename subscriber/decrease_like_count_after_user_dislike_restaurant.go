@@ -3,7 +3,6 @@ package subscriber
 import (
 	"context"
 	"food_delivery/component/appctx"
-	restaurantstorage "food_delivery/module/restaurant/storage"
 	"food_delivery/pubsub"
 )
 
@@ -27,9 +26,10 @@ func DecreaseLikeCountAfterUserDisLikeRestaurant(appCtx appctx.AppContext) consu
 	return consumerJob{
 		Title: "Decrease like count after user dislikes restaurant",
 		Hld: func(ctx context.Context, message *pubsub.Message) error {
-			store := restaurantstorage.NewSQLStore(appCtx.GetMainDBConnection())
-			likeData := message.Data().(HasRestaurantId)
-			return store.DecreaseLikeCount(ctx, likeData.GetRestaurantId())
+			// store := restaurantstorage.NewSQLStore(appCtx.GetMainDBConnection())
+			// likeData := message.Data().(HasRestaurantId)
+			// return store.DecreaseLikeCount(ctx, likeData.GetRestaurantId())
+			return nil
 		},
 	}
 

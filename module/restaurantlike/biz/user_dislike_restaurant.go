@@ -5,16 +5,16 @@ import (
 	"food_delivery/common"
 	restaurantlikemodel "food_delivery/module/restaurantlike/model"
 	"food_delivery/pubsub"
-	"log"
 )
 
 type UserDislikeRestaurantStore interface {
 	Delete(ctx context.Context, userId, restaurantId int) error
+	FindUserLike(ctx context.Context, userId, restaurantId int) (*restaurantlikemodel.Like, error)
 }
 
-// type DecLikeCountResStore interface {
-// 	DecreaseLikeCount(ctx context.Context, id int) error
-// }
+type DecLikeCountResStore interface {
+	DecreaseLikeCount(ctx context.Context, id int) error
+}
 
 type userDislikeRestaurantBiz struct {
 	store UserDislikeRestaurantStore
@@ -34,27 +34,40 @@ func NewUserDislikeRestaurantBiz(
 	}
 }
 func (biz *userDislikeRestaurantBiz) DislikeRestaurant(ctx context.Context, userId, restaurantId int) error {
-	err := biz.store.Delete(ctx, userId, restaurantId)
+	oldData, err := biz.store.FindUserLike(ctx, userId, restaurantId)
+
+	if oldData == nil {
+		return restaurantlikemodel.ErrCannotDidNotlikeRestaurant(err)
+	}
+
+	err = biz.store.Delete(ctx, userId, restaurantId)
 
 	if err != nil {
 		return restaurantlikemodel.ErrCannotUnlikeRestaurant(err)
 	}
 
-	// Get Like count of restaurant => <0 thi khong decrease
-
-	data := &restaurantlikemodel.Like{RestaurantId: restaurantId}
-	// Send message
-	if err := biz.ps.Publish(ctx, common.TopicUserDislikeRestaurant, pubsub.NewMessage(data)); err != nil {
-		log.Println(err)
-	}
 	// // Side effect
-	// j := asyncjob.NewJob(func(ctx context.Context) error {
-	// 	return biz.decStore.DecreaseLikeCount(ctx, restaurantId)
-	// })
+	// go func() {
+	// 	defer common.AppRecover()
+	// 	job := asyncjob.NewJob(func(ctx context.Context) error {
+	// 		if err := biz.decStore.DecreaseLikeCount(ctx, restaurantId); err != nil {
+	// 			logger.GetCurrent().GetLogger("user.dislike.restaurant").Errorln(err)
+	// 			return err
+	// 		}
 
-	// if err := asyncjob.NewGroup(true, j).Run(ctx); err != nil {
-	// 	log.Println(err)
-	// }
+	// 		return nil
+	// 	}, asyncjob.WithName("DecreaseLikeCount"))
+
+	// 	if err := asyncjob.NewGroup(false, job).Run(ctx); err != nil {
+	// 		logger.GetCurrent().GetLogger("user.dislike.restaurant").Errorln(err)
+	// 	}
+	// }()
+
+	newMessage := pubsub.NewMessage(map[string]interface{}{
+		"user_id":       userId,
+		"restaurant_id": restaurantId,
+	})
+	biz.ps.Publish(ctx, common.TopicUserDislikeRestaurant, newMessage)
 
 	return nil
 

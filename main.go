@@ -153,5 +153,6 @@ import "food_delivery/cmd"
 
 func main() {
 	cmd.Execute()
-
+	// dsn := os.Getenv("MYSQL_CONN_STRING")
+	// fmt.Println("dsn ", dsn)
 }

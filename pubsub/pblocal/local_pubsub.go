@@ -13,16 +13,18 @@ import (
 // Because we want to send a message with a specific topic for many subscribers in a group cai gi do
 
 type localPubSub struct {
+	name         string
 	messageQueue chan *pubsub.Message
 
-	mapChannel map[pubsub.Topic][]chan *pubsub.Message
+	mapChannel map[string][]chan *pubsub.Message
 	locker     *sync.RWMutex
 }
 
-func NewPubSub() *localPubSub {
+func NewPubSub(name string) *localPubSub {
 	pb := &localPubSub{
+		name:         name,
 		messageQueue: make(chan *pubsub.Message, 10000),
-		mapChannel:   make(map[pubsub.Topic][]chan *pubsub.Message),
+		mapChannel:   make(map[string][]chan *pubsub.Message),
 		locker:       new(sync.RWMutex),
 	}
 
@@ -32,7 +34,7 @@ func NewPubSub() *localPubSub {
 
 }
 
-func (ps *localPubSub) Publish(ctx context.Context, topic pubsub.Topic, data *pubsub.Message) error {
+func (ps *localPubSub) Publish(ctx context.Context, topic string, data *pubsub.Message) error {
 	data.SetChannel(topic)
 
 	go func() {
@@ -42,7 +44,7 @@ func (ps *localPubSub) Publish(ctx context.Context, topic pubsub.Topic, data *pu
 	}()
 	return nil
 }
-func (ps *localPubSub) Subcribe(ctx context.Context, topic pubsub.Topic) (ch <-chan *pubsub.Message, close func()) {
+func (ps *localPubSub) Subscribe(ctx context.Context, topic string) (ch <-chan *pubsub.Message, unsubscribe func()) {
 	c := make(chan *pubsub.Message)
 
 	ps.locker.Lock()
@@ -57,17 +59,23 @@ func (ps *localPubSub) Subcribe(ctx context.Context, topic pubsub.Topic) (ch <-c
 	ps.locker.Unlock()
 
 	return c, func() {
-		log.Println("UnSubcribe")
+		log.Println("Unsubscribe")
 
 		if chans, ok := ps.mapChannel[topic]; ok {
 			for i := range chans {
 				if chans[i] == c {
 					// remove element at index in chans
+					// [1,2,3,4,5] //  i = 3
+					// [1,2,3] (arr[:i])
+					// [5] (arr[i+1:])
+					// [1,2,3,5]
 					chans = append(chans[:i], chans[i+1:]...)
 
 					ps.locker.Lock()
 					ps.mapChannel[topic] = chans
 					ps.locker.Unlock()
+
+					close(c)
 					break
 
 				}
@@ -96,4 +104,32 @@ func (ps *localPubSub) run() error {
 	}()
 
 	return nil
+}
+func (ps *localPubSub) GetPrefix() string {
+	return ps.name
+}
+
+func (ps *localPubSub) Get() interface{} {
+	return ps
+}
+
+func (ps *localPubSub) Name() string {
+	return ps.name
+}
+
+func (ps *localPubSub) InitFlags() {
+}
+
+func (ps *localPubSub) Configure() error {
+	return nil
+}
+
+func (ps *localPubSub) Run() error {
+	return nil
+}
+
+func (ps *localPubSub) Stop() <-chan bool {
+	c := make(chan bool)
+	go func() { c <- true }()
+	return c
 }

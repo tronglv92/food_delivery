@@ -12,23 +12,27 @@ import (
 )
 
 func DeleteRestaurant(sc goservice.ServiceContext) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		db := sc.MustGet(common.DBMain).(*gorm.DB)
+	return func(c *gin.Context) {
 
-		requester := ctx.MustGet(common.CurrentUser).(common.Requester)
+		// requester := ctx.MustGet(common.CurrentUser).(common.Requester)
 		//id, err := strconv.Atoi(ctx.Param("id"))
 
-		uid, err := common.FromBase58(ctx.Param("id"))
+		uid, err := common.FromBase58(c.Param("id"))
 
 		if err != nil {
-			panic(common.ErrInvalidRequest(err))
+			c.JSON(http.StatusBadRequest, common.ErrInvalidRequest(err))
+			return
 		}
-		store := restaurantstorage.NewSQLStore(db)
 
-		biz := restaurantbiz.NewDeleteRestaurantBiz(store, requester)
-		if err := biz.DeleteRestaurant(ctx.Request.Context(), int(uid.GetLocalID())); err != nil {
-			panic(err)
+		db := sc.MustGet(common.DBMain).(*gorm.DB)
+		storage := restaurantstorage.NewSQLStore(db)
+		biz := restaurantbiz.NewDeleteRestaurantBiz(storage)
+
+		if err := biz.DeleteRestaurant(c.Request.Context(), int(uid.GetLocalID())); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
 		}
-		ctx.JSON(http.StatusOK, common.SimpleSuccessResponse(1))
+
+		c.JSON(http.StatusOK, common.SimpleSuccessResponse(true))
 	}
 }

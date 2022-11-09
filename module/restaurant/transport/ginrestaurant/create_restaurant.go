@@ -34,7 +34,7 @@ func CreateRestaurant(sc goservice.ServiceContext) gin.HandlerFunc {
 			panic(err)
 		}
 
-		data.Mask(false)
+		data.Mask(common.DbTypeRestaurant)
 
 		ctx.JSON(http.StatusOK, common.SimpleSuccessResponse(data.FakeId.String()))
 	}

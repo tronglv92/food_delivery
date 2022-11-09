@@ -8,6 +8,18 @@ import (
 	"gorm.io/gorm"
 )
 
+func (store *sqlStore) UpdateRestaurant(
+	ctx context.Context,
+	cond map[string]interface{},
+	data *restaurantmodel.RestaurantUpdate,
+) error {
+	if err := store.db.Where(cond).Updates(data).Error; err != nil {
+		return common.ErrDB(err)
+	}
+
+	return nil
+}
+
 func (s *sqlStore) IncreaseLikeCount(ctx context.Context, id int) error {
 	db := s.db
 

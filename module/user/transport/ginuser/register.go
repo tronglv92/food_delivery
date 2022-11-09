@@ -30,7 +30,7 @@ func Register(sc goservice.ServiceContext) func(*gin.Context) {
 		if err := biz.Register(c.Request.Context(), &data); err != nil {
 			panic(err)
 		}
-		data.Mask(false)
+		data.Mask(common.DbTypeUser)
 		c.JSON(http.StatusOK, common.SimpleSuccessResponse(data.FakeId.String()))
 	}
 }

@@ -4,7 +4,7 @@ import "context"
 
 type Topic string
 type Pubsub interface {
-	Publish(ctx context.Context, channel Topic, data *Message) error
-	Subcribe(ctx context.Context, channel Topic) (ch <-chan *Message, close func())
+	Publish(ctx context.Context, channel string, data *Message) error
+	Subscribe(ctx context.Context, channel string) (ch <-chan *Message, close func())
 	//UnSubcribe(ctx context.Context, channel Channel) error
 }

@@ -31,9 +31,6 @@ func (u *User) GetRole() string {
 func (User) TableName() string {
 	return "users"
 }
-func (u *User) Mask(isAdmin bool) {
-	u.GenUID(common.DbTypeUser)
-}
 
 type UserCreate struct {
 	common.SQLModel `json:",inline"`
@@ -48,9 +45,6 @@ type UserCreate struct {
 
 func (UserCreate) TableName() string {
 	return User{}.TableName()
-}
-func (u *UserCreate) Mask(isAdmin bool) {
-	u.GenUID(common.DbTypeUser)
 }
 
 type UserLogin struct {
