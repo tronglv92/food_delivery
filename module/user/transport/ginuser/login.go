@@ -5,7 +5,7 @@ import (
 	"food_delivery/component/hasher"
 	userbiz "food_delivery/module/user/biz"
 	usermodel "food_delivery/module/user/model"
-	userstore "food_delivery/module/user/store"
+	userstore "food_delivery/module/user/storage"
 	"food_delivery/plugin/tokenprovider"
 	"net/http"
 

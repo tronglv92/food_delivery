@@ -5,7 +5,7 @@ import (
 	"food_delivery/common"
 	"food_delivery/component/appctx"
 	"food_delivery/component/asyncjob"
-	"food_delivery/pubsub"
+	"food_delivery/plugin/pubsub"
 	"log"
 )
 

@@ -5,7 +5,7 @@ import (
 	rstlikebiz "food_delivery/module/restaurantlike/biz"
 	restaurantlikemodel "food_delivery/module/restaurantlike/model"
 	restaurantlikestorage "food_delivery/module/restaurantlike/storage"
-	"food_delivery/pubsub"
+	"food_delivery/plugin/pubsub"
 	"net/http"
 
 	goservice "food_delivery/plugin/go-sdk"

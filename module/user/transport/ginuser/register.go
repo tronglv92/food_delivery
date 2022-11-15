@@ -5,7 +5,7 @@ import (
 	"food_delivery/component/hasher"
 	userbiz "food_delivery/module/user/biz"
 	usermodel "food_delivery/module/user/model"
-	userstorage "food_delivery/module/user/store"
+	userstorage "food_delivery/module/user/storage"
 	"net/http"
 
 	goservice "food_delivery/plugin/go-sdk"

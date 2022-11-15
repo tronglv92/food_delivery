@@ -3,7 +3,7 @@ package subscriber
 import (
 	"context"
 	"food_delivery/component/appctx"
-	"food_delivery/pubsub"
+	"food_delivery/plugin/pubsub"
 )
 
 // func DecreaseLikeCountAfterUserDisLikeRestaurant(appCtx appctx.AppContext, ctx context.Context) {

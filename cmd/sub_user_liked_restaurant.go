@@ -5,11 +5,11 @@ import (
 	"food_delivery/common"
 	"food_delivery/component/asyncjob"
 	restaurantstorage "food_delivery/module/restaurant/storage"
-	"food_delivery/plugin/sdkgorm"
-	"food_delivery/pubsub"
+	"food_delivery/plugin/pubsub"
+	"food_delivery/plugin/storage/sdkgorm"
 	"log"
 
-	appnats "food_delivery/pubsub/nats"
+	appnats "food_delivery/plugin/pubsub/nats"
 
 	goservice "food_delivery/plugin/go-sdk"
 

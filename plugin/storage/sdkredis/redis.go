@@ -1,4 +1,4 @@
-package appredis
+package sdkredis
 
 import (
 	"context"

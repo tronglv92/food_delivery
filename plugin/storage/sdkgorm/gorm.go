@@ -3,7 +3,7 @@ package sdkgorm
 import (
 	"errors"
 	"flag"
-	"food_delivery/plugin/sdkgorm/gormdialects"
+	"food_delivery/plugin/storage/sdkgorm/gormdialects"
 
 	"strings"
 	"sync"

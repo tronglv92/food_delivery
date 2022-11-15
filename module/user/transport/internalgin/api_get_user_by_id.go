@@ -4,7 +4,7 @@ import (
 	"food_delivery/common"
 	"net/http"
 
-	userstorage "food_delivery/module/user/store"
+	userstorage "food_delivery/module/user/storage"
 
 	goservice "food_delivery/plugin/go-sdk"
 

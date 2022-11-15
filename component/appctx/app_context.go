@@ -2,7 +2,7 @@ package appctx
 
 import (
 	"food_delivery/component/uploadprovider"
-	"food_delivery/pubsub"
+	"food_delivery/plugin/pubsub"
 	"food_delivery/skio"
 
 	"google.golang.org/grpc"

@@ -3,7 +3,7 @@ package subscriber
 import (
 	"context"
 	"food_delivery/component/appctx"
-	"food_delivery/pubsub"
+	"food_delivery/plugin/pubsub"
 )
 
 type HasRestaurantId interface {

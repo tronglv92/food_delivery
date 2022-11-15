@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"food_delivery/common"
 	"net"
+	"time"
 
 	"food_delivery/plugin/go-sdk/logger"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 type grpcServer struct {
@@ -42,20 +44,26 @@ func (s *grpcServer) InitFlags() {
 func (s *grpcServer) Configure() error {
 	s.logger = logger.GetCurrent().GetLogger(s.prefix)
 	s.logger.Infoln("Setup gRPC service:", s.prefix)
+	s.logger.Infoln("Setup gRPC service:", s.port)
 	s.server = grpc.NewServer()
+	reflection.Register(s.server)
 	return nil
 }
 func (s *grpcServer) Run() error {
 	go func() {
 		defer common.AppRecover()
-		// time.Sleep(time.Second * 3)
+		time.Sleep(time.Second * 3)
 		_ = s.Configure()
 		if s.registerHdl != nil {
 			s.logger.Infoln("registering services...")
 			s.registerHdl(s.server)
 		}
+
 		address := fmt.Sprintf("0.0.0.0:%d", s.port)
 		lis, err := net.Listen("tcp", address)
+		// if address != '' {
+		// 	s.logger.Info("Connected gRPC service at ", address)
+		// }
 
 		if err != nil {
 			s.logger.Errorln("Error %v", err)

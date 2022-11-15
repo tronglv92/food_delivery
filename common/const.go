@@ -15,6 +15,7 @@ const (
 	PluginPubSub         = "pubsub"
 	PluginNATS           = "nats"
 	PluginRedis          = "redis"
+	PluginES             = "elastic-search"
 	PluginGrpcServer     = "grpc-server"
 	PluginGrpcUserClient = "grpc-user-client"
 

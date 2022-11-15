@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
-	"food_delivery/pubsub"
+	"food_delivery/plugin/pubsub"
 	"time"
 
 	"food_delivery/plugin/go-sdk/logger"

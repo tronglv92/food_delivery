@@ -4,7 +4,7 @@ import (
 	"context"
 	"food_delivery/common"
 	restaurantlikemodel "food_delivery/module/restaurantlike/model"
-	"food_delivery/pubsub"
+	"food_delivery/plugin/pubsub"
 )
 
 type UserLikeRestaurantStore interface {

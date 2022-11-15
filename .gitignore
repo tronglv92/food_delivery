@@ -4,3 +4,4 @@ app
 .DS_STORE
 vendor
 .env
+volumes/elasticsearch/*

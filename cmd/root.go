@@ -5,19 +5,19 @@ import (
 	handlers "food_delivery/cmd/handler"
 	"food_delivery/common"
 	"food_delivery/middleware"
-	"food_delivery/module/user/store/grpcstore"
-	"food_delivery/plugin/appredis"
+	"food_delivery/module/user/storage/grpcstore"
+	appnats "food_delivery/plugin/pubsub/nats"
+	"food_delivery/plugin/pubsub/pblocal"
 	appgrpc "food_delivery/plugin/remotecall/grpc"
-	"food_delivery/plugin/sdkgorm"
+	"food_delivery/plugin/storage/sdkes"
+	"food_delivery/plugin/storage/sdkgorm"
+	"food_delivery/plugin/storage/sdkredis"
 	"food_delivery/plugin/tokenprovider/jwt"
-	appnats "food_delivery/pubsub/nats"
-	"food_delivery/pubsub/pblocal"
+	user "food_delivery/proto"
 	"net/http"
 	"os"
 
-	user "food_delivery/proto"
-
-	userstorage "food_delivery/module/user/store"
+	userstorage "food_delivery/module/user/storage"
 
 	goservice "food_delivery/plugin/go-sdk"
 
@@ -35,7 +35,8 @@ func newService() goservice.Service {
 		goservice.WithInitRunnable(jwt.NewTokenJWTProvider(common.JWTProvider)),
 		goservice.WithInitRunnable(pblocal.NewPubSub(common.PluginPubSub)),
 		goservice.WithInitRunnable(appnats.NewNATS(common.PluginNATS)),
-		goservice.WithInitRunnable(appredis.NewRedisDB("redis", common.PluginRedis)),
+		goservice.WithInitRunnable(sdkredis.NewRedisDB("redis", common.PluginRedis)),
+		goservice.WithInitRunnable(sdkes.NewES("elastic", common.PluginES)),
 		goservice.WithInitRunnable(appgrpc.NewGRPCServer(common.PluginGrpcServer)),
 		goservice.WithInitRunnable(appgrpc.NewUserClient(common.PluginGrpcUserClient)),
 	)
@@ -74,6 +75,7 @@ var rootCmd = &cobra.Command{
 		if err := service.Start(); err != nil {
 			serviceLogger.Fatalln(err)
 		}
+
 	},
 }
 

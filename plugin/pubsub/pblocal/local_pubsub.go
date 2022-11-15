@@ -3,7 +3,7 @@ package pblocal
 import (
 	"context"
 	"food_delivery/common"
-	"food_delivery/pubsub"
+	"food_delivery/plugin/pubsub"
 	"log"
 	"sync"
 )

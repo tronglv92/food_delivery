@@ -6,7 +6,7 @@ import (
 	"food_delivery/middleware"
 	"food_delivery/module/restaurant/transport/ginrestaurant"
 	"food_delivery/module/restaurantlike/transport/ginrstlike"
-	userstorage "food_delivery/module/user/store"
+	userstorage "food_delivery/module/user/storage"
 	usergin "food_delivery/module/user/transport/ginuser"
 	"net/http"
 

@@ -1,0 +1,112 @@
+version: "3"
+networks:
+  g06:
+    driver: bridge
+services:
+  mysql:
+    image: bitnami/mysql:latest
+    container_name: sem_mysql
+    # restart: on-failure
+    ports:
+      - 3308:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_DATABASE: food_delivery
+      MYSQL_USER: food_delivery
+      MYSQL_PASSWORD: cuncondethuong
+    volumes:
+      # Dump files for initiating tables
+      - ./data/:/docker-entrypoint-initdb.d/
+    networks:
+      - g06
+    
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    container_name: sem_elasticsearch
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - ./volumes/elasticsearch:/usr/share/elasticsearch/data
+    logging:
+        driver: "json-file"
+        options:
+            max-size: "10k"
+            max-file: "10"
+    networks:
+      - g06
+  logstash:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sem_logstash
+    # restart: on-failure
+    depends_on:
+      - mysql
+      - elasticsearch
+    volumes:
+      - ./volumes/logstash/pipeline/:/usr/share/logstash/pipeline/
+      - ./volumes/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./volumes/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      - ./volumes/logstash/config/queries/:/usr/share/logstash/config/queries/
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10k"
+        max-file: "10"
+    networks:
+      - g06
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.0
+    container_name: sem_kibana
+    environment:
+      - "ELASTICSEARCH_URL=http://elasticsearch:9200"
+      - "SERVER_NAME=127.0.0.1"
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+    networks:
+      - g06
+  nats:
+    image: nats
+    container_name: nats
+    ports:
+      - 8222:8222
+      - 4222:4222
+    networks: 
+      - g06
+  redis:
+    image: 'bitnami/redis:latest'
+    container_name: redis
+    ports:
+      - 6379:6379
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - ./volumes/redis:/bitnami/redis/data
+    networks:
+      - g06
+  # netdata:
+  #   image: netdata/netdata
+  #   container_name: netdata
+  #   hostname: example.com # set to fqdn of host
+  #   ports:
+  #     - 19999:19999
+  #   restart: unless-stopped
+  #   cap_add:
+  #     - SYS_PTRACE
+  #   security_opt:
+  #     - apparmor:unconfined
+  #   volumes:
+  #     - ./volumes/netdata/netdataconfig:/etc/netdata
+  #     - ./volumes/netdata/netdatalib:/var/lib/netdata
+  #     - ./volumes/netdata/netdatacache:/var/cache/netdata
+  #     - ./volumes/netdata/etc/passwd:/host/etc/passwd:ro
+  #     - ./volumes/netdata/etc/group:/host/etc/group:ro
+  #     - ./volumes/netdata/proc:/host/proc:ro
+  #     - ./volumes/netdata/sys:/host/sys:ro
+  #     - ./volumes/netdata/etc/os-release:/host/etc/os-release:ro
+  
+
