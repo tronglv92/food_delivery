@@ -25,6 +25,7 @@ const (
 
 	TopicUserLikeRestaurant    = "restaurant.liked"
 	TopicUserDislikeRestaurant = "restaurant.disliked"
+	TopicSendNotification      = "fcm.notification"
 )
 
 const (
