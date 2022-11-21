@@ -4,15 +4,13 @@ import (
 	"context"
 	"food_delivery/common"
 	"food_delivery/component/asyncjob"
-	restaurantstorage "food_delivery/module/restaurant/storage"
+	restaurantstorage "food_delivery/module/restaurant/storage/gorm"
 	"food_delivery/plugin/pubsub"
 	"food_delivery/plugin/storage/sdkgorm"
 	"log"
-
 	appnats "food_delivery/plugin/pubsub/nats"
 
 	goservice "food_delivery/plugin/go-sdk"
-
 	"github.com/spf13/cobra"
 	"gorm.io/gorm"
 )

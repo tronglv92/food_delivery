@@ -16,6 +16,14 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Current Database: `food_delivery`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `food_delivery` /*!40100 DEFAULT CHARACTER SET utf8mb3 */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `food_delivery`;
+
+--
 -- Table structure for table `carts`
 --
 
@@ -385,7 +393,7 @@ CREATE TABLE `restaurants` (
   KEY `owner_id` (`user_id`) USING BTREE,
   KEY `city_id` (`city_id`) USING BTREE,
   KEY `status` (`status`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -394,7 +402,7 @@ CREATE TABLE `restaurants` (
 
 LOCK TABLES `restaurants` WRITE;
 /*!40000 ALTER TABLE `restaurants` DISABLE KEYS */;
-INSERT INTO `restaurants` VALUES (8,1,'test1','some where',NULL,NULL,NULL,NULL,NULL,0,0,1,'2022-11-14 15:26:45','2022-11-14 15:26:45');
+INSERT INTO `restaurants` VALUES (8,4,'test1','some where',NULL,NULL,NULL,NULL,NULL,1,0,0,'2022-11-14 15:26:45','2022-11-16 08:42:26'),(9,5,'Test restaurant 1','somewhere',NULL,NULL,NULL,NULL,NULL,2,0,0,'2022-11-16 10:12:09','2022-11-16 08:46:55'),(10,6,'Test restaurant 2','somewhere',NULL,NULL,NULL,NULL,NULL,3,0,1,'2022-11-16 10:12:12','2022-11-16 08:46:55'),(11,3,'Test restaurant 3','somewhere',NULL,NULL,NULL,NULL,NULL,4,0,1,'2022-11-16 10:12:14','2022-11-16 03:14:32'),(12,3,'Test restaurant 4','somewhere',NULL,NULL,NULL,NULL,NULL,5,0,1,'2022-11-16 10:12:17','2022-11-16 03:14:32'),(13,3,'Test restaurant 5','somewhere',NULL,NULL,NULL,NULL,NULL,6,0,1,'2022-11-16 10:12:19','2022-11-16 03:14:32'),(14,3,'Cua biển quy nhơn','somewhere',NULL,NULL,NULL,NULL,NULL,7,0,1,'2022-11-16 10:12:43','2022-11-16 03:14:32'),(15,3,'beef and beer','somewhere',NULL,NULL,NULL,NULL,NULL,8,0,1,'2022-11-16 10:13:23','2022-11-16 03:14:32'),(16,3,'mi tom chua cay','somewhere',NULL,NULL,NULL,NULL,NULL,9,0,1,'2022-11-16 10:13:41','2022-11-16 03:14:32'),(17,3,'susshi japan','somewhere',NULL,NULL,NULL,NULL,NULL,10,0,1,'2022-11-16 10:13:50','2022-11-16 03:14:32'),(18,3,'susshi japan','somewhere',NULL,NULL,NULL,NULL,NULL,0,0,1,'2022-11-16 11:50:36','2022-11-16 11:50:36');
 /*!40000 ALTER TABLE `restaurants` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -482,7 +490,7 @@ CREATE TABLE `restaurants_journal` (
   `action_type` enum('create','update','delete') DEFAULT NULL,
   `action_time` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`journal_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -491,7 +499,6 @@ CREATE TABLE `restaurants_journal` (
 
 LOCK TABLES `restaurants_journal` WRITE;
 /*!40000 ALTER TABLE `restaurants_journal` DISABLE KEYS */;
-INSERT INTO `restaurants_journal` VALUES (2,'8','create','2022-11-14 15:26:45');
 /*!40000 ALTER TABLE `restaurants_journal` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -584,7 +591,7 @@ CREATE TABLE `users` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -593,6 +600,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (3,'test@gmail.com',NULL,NULL,'c702176f37591d33293ab64e33746039','WrMENbtAwNvxpNdqwLEmsXJVjbKCzuBaqrJYaopeBpIwmbodHf','test2','test1',NULL,'user',NULL,1,'2022-11-16 10:11:29',NULL),(4,'test2@gmail.com',NULL,NULL,'8f12b6ee01147a952ed03574ee250713','dEcoMiZbbeyISUGkMIumiYbEYWJwFBBDIQTdHemuKfDKNCvxCF','test2','test1',NULL,'user',NULL,1,'2022-11-16 10:11:33',NULL),(5,'test3@gmail.com',NULL,NULL,'ef7f7c602ae4e987077b87d8c59a7908','ZUvvqSPYGTxjLwgqGyQylvcnEwZITmZCxtaLUpYMyXSFmWVmFq','test2','test1',NULL,'user',NULL,1,'2022-11-16 10:11:36',NULL),(6,'test4@gmail.com',NULL,NULL,'bfa2844b086e0ba143b9a62c1bc10ba2','mJPfzdOYLVHkNHRmzNugaAvKqzJuYTqxgOkeDasVqBPsPHgScs','test2','test1',NULL,'user',NULL,1,'2022-11-16 10:11:38',NULL),(7,'test5@gmail.com',NULL,NULL,'a84839ca385b7468538442a1b43e1e82','pJvCYLISHGBiusQzVdYLGBBRpokPpxVwftHmYJuUuiAXmPsILS','test2','test1',NULL,'user',NULL,1,'2022-11-16 10:11:41',NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -609,4 +617,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-11-14 15:27:14
+-- Dump completed on 2022-11-16  8:47:58

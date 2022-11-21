@@ -11,6 +11,8 @@ const (
 const (
 	CurrentUser          = "user"
 	DBMain               = "mysql"
+	DBMongo              = "mongo"
+	PluginUserService    = "user-service"
 	JWTProvider          = "jwt"
 	PluginPubSub         = "pubsub"
 	PluginNATS           = "nats"
@@ -18,9 +20,16 @@ const (
 	PluginES             = "elastic-search"
 	PluginGrpcServer     = "grpc-server"
 	PluginGrpcUserClient = "grpc-user-client"
+	PluginAWS            = "aws"
+	PluginFCM            = "fcm"
 
 	TopicUserLikeRestaurant    = "restaurant.liked"
 	TopicUserDislikeRestaurant = "restaurant.disliked"
+)
+
+const (
+	DBMongoName     = "food_delivery"
+	UsersCollection = "Users"
 )
 
 // const (

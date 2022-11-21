@@ -48,7 +48,7 @@ func NewS3Provider(bucketName string, region string, apiKey string, secret strin
 func (provider *s3Provider) SaveFileUploaded(ctx context.Context, data []byte, dst string) (*common.Image, error) {
 	fileBytes := bytes.NewReader(data)
 	fileType := http.DetectContentType(data)
-
+	
 	// CLIENT => SERVER => AWS3
 	_, err := s3.New(provider.session).PutObject(&s3.PutObjectInput{
 		Bucket:      aws.String(provider.bucketName),

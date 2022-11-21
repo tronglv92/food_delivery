@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-const EntityName = "restaurant"
+const EntityName = "restaurants"
 
 type Restaurant struct {
 	common.SQLModel
@@ -30,6 +30,34 @@ func (r *Restaurant) Mask(isAdminOrOwner bool) {
 	if v := r.User; v != nil {
 		v.Mask(common.DbTypeUser)
 	}
+}
+
+type RestaurantES struct {
+	Name       string `json:"name"`
+	Addr       string `json:"addr"`
+	UserId     int    `json:"user_id"`
+	Id         int    `json:"id"`
+	LikedCount int    `json:"liked_count"`
+}
+
+func (r *RestaurantES) ToRestaurant() Restaurant {
+
+	uid := common.NewUID(uint32(r.Id), int(common.DbTypeRestaurant), 1)
+
+	fakeOwnerId := common.NewUID(uint32(r.UserId), int(common.DbTypeRestaurant), 1)
+	rs := Restaurant{
+		SQLModel: common.SQLModel{
+			Id:     int(uid.GetLocalID()),
+			FakeId: &uid,
+		},
+		Name:        r.Name,
+		Addr:        r.Addr,
+		UserId:      r.UserId,
+		LikedCount:  r.LikedCount,
+		FakeOwnerId: &fakeOwnerId,
+	}
+
+	return rs
 }
 
 type RestaurantCreate struct {

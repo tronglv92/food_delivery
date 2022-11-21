@@ -1,23 +1,24 @@
 package ginrestaurant
 
 import (
+	"context"
 	"food_delivery/common"
 	restaurantbiz "food_delivery/module/restaurant/biz"
 	restaurantmodel "food_delivery/module/restaurant/model"
 	restaurantrepo "food_delivery/module/restaurant/repository"
-	restaurantstorage "food_delivery/module/restaurant/storage"
-	restaurantlikestorage "food_delivery/module/restaurantlike/storage"
+	resstorageES "food_delivery/module/restaurant/storage/elastic"
+	restaurantstorage "food_delivery/module/restaurant/storage/gorm"
 	"net/http"
 
 	goservice "food_delivery/plugin/go-sdk"
 
 	"github.com/gin-gonic/gin"
+	"github.com/olivere/elastic/v7"
 	"gorm.io/gorm"
 )
 
 func ListRestaurant(sc goservice.ServiceContext) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		db := sc.MustGet(common.DBMain).(*gorm.DB)
 
 		var pagingData common.Paging
 
@@ -33,13 +34,23 @@ func ListRestaurant(sc goservice.ServiceContext) gin.HandlerFunc {
 		if err := ctx.ShouldBind(&filter); err != nil {
 			panic(common.ErrInvalidRequest(err))
 		}
+		db := sc.MustGet(common.DBMain).(*gorm.DB)
+		_ = restaurantstorage.NewSQLStore(db)
 
-		store := restaurantstorage.NewSQLStore(db)
-		likeStore := restaurantlikestorage.NewSQLStore(db)
+		client := sc.MustGet(common.PluginES).(*elastic.Client)
+		esStore := resstorageES.NewESStore(client)
+
+		// likeStore := restaurantlikestorage.NewSQLStore(db)
 
 		// likeStore := grpcstore.NewGRPCClient(demo.NewRestaurantLikeServiceClient(appCtx.GetGRPCClientConnection()))
+		//userStore := userstorage.NewSQLStore(db)
+		//userStore := restaurantapi.NewUserApi("http://localhost:4001")
 
-		repo := restaurantrepo.NewListRestaurantRepo(store, likeStore)
+		userService := sc.MustGet(common.PluginGrpcUserClient).(interface {
+			GetUsers(ctx context.Context, ids []int) ([]common.SimpleUser, error)
+		})
+
+		repo := restaurantrepo.NewListRestaurantRepo(esStore, userService)
 		biz := restaurantbiz.NewListRestaurantBiz(repo)
 		result, err := biz.ListRestaurant(ctx.Request.Context(), &filter, &pagingData)
 

@@ -23,6 +23,8 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
     container_name: sem_elasticsearch
+    ports:
+      - 9200:9200
     environment:
       - discovery.type=single-node
       - bootstrap.memory_lock=true
@@ -36,27 +38,27 @@ services:
             max-file: "10"
     networks:
       - g06
-  logstash:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: sem_logstash
-    # restart: on-failure
-    depends_on:
-      - mysql
-      - elasticsearch
-    volumes:
-      - ./volumes/logstash/pipeline/:/usr/share/logstash/pipeline/
-      - ./volumes/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
-      - ./volumes/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
-      - ./volumes/logstash/config/queries/:/usr/share/logstash/config/queries/
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10k"
-        max-file: "10"
-    networks:
-      - g06
+  # logstash:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: sem_logstash
+  #   # restart: on-failure
+  #   depends_on:
+  #     - mysql
+  #     - elasticsearch
+  #   volumes:
+  #     - ./volumes/logstash/pipeline/:/usr/share/logstash/pipeline/
+  #     - ./volumes/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+  #     - ./volumes/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+  #     - ./volumes/logstash/config/queries/:/usr/share/logstash/config/queries/
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10k"
+  #       max-file: "10"
+  #   networks:
+  #     - g06
   kibana:
     image: docker.elastic.co/kibana/kibana:7.17.0
     container_name: sem_kibana
@@ -88,6 +90,34 @@ services:
       - ./volumes/redis:/bitnami/redis/data
     networks:
       - g06
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaegertracing
+    ports:
+      - "6831:6831/udp"
+      - "16686:16686"
+    networks:
+      - g06
+  mongo:
+    image: mongo
+    container_name: sem-mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  mongo-express:
+    image: mongo-express
+    container_name: sem-mongo-express
+    restart: always
+    ports:
+      - 8083:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
   # netdata:
   #   image: netdata/netdata
   #   container_name: netdata

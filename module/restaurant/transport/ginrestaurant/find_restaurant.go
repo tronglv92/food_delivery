@@ -3,7 +3,7 @@ package ginrestaurant
 import (
 	"food_delivery/common"
 	restaurantbiz "food_delivery/module/restaurant/biz"
-	restaurantstorage "food_delivery/module/restaurant/storage"
+	restaurantstorage "food_delivery/module/restaurant/storage/gorm"
 	"net/http"
 
 	goservice "food_delivery/plugin/go-sdk"

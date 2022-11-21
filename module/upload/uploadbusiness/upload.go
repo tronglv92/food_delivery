@@ -5,13 +5,9 @@ import (
 	"context"
 	"fmt"
 	"food_delivery/common"
-	"food_delivery/component/uploadprovider"
 	"food_delivery/module/upload/uploadmodel"
+	"food_delivery/plugin/aws"
 	"image"
-
-	_ "image/gif"
-	_ "image/jpeg"
-	_ "image/png"
 	"io"
 	"log"
 	"path/filepath"
@@ -22,13 +18,14 @@ import (
 type CreateImageStorage interface {
 	CreateImage(context context.Context, data *common.Image) error
 }
+
 type uploadBiz struct {
-	provider uploadprovider.UploadProvider
+	s3       aws.S3
 	imgStore CreateImageStorage
 }
 
-func NewUploadBiz(provider uploadprovider.UploadProvider, imgStore CreateImageStorage) *uploadBiz {
-	return &uploadBiz{provider: provider, imgStore: imgStore}
+func NewUploadBiz(s3 aws.S3, imgStore CreateImageStorage) *uploadBiz {
+	return &uploadBiz{s3: s3, imgStore: imgStore}
 }
 
 func (biz *uploadBiz) Upload(ctx context.Context, data []byte, folder, fileName string) (*common.Image, error) {
@@ -39,21 +36,33 @@ func (biz *uploadBiz) Upload(ctx context.Context, data []byte, folder, fileName 
 	if err != nil {
 		return nil, uploadmodel.ErrFileIsNotImage(err)
 	}
+
 	if strings.TrimSpace(folder) == "" {
 		folder = "img"
 	}
-	fileExt := filepath.Ext(fileName)                                // "img.jpg" => ".jpg"
-	fileName = fmt.Sprintf("%d%s", time.Now().Nanosecond(), fileExt) // 237482374823.jpg
 
-	img, err := biz.provider.SaveFileUploaded(ctx, data, fmt.Sprintf("%s/%s", folder, fileName))
+	fileExt := filepath.Ext(fileName)                                // "img.jpg" => ".jpg"
+	fileName = fmt.Sprintf("%d%s", time.Now().Nanosecond(), fileExt) // 9129324893248.jpg
+
+	url, err := biz.s3.UploadFileData(ctx, data, fmt.Sprintf("%s/%s", folder, fileName))
+	// img, err := biz.s3.SaveFileUploaded(ctx, data, fmt.Sprintf("%s/%s", folder, fileName))
 
 	if err != nil {
 		return nil, uploadmodel.ErrCannotSaveFile(err)
 	}
 
-	img.Width = w
-	img.Height = h
-	img.Extension = fileExt
+	img := &common.Image{
+		Width:     w,
+		Height:    h,
+		Url:       url,
+		Extension: fileExt,
+		CloudName: "s3",
+	}
+
+	if err := biz.imgStore.CreateImage(ctx, img); err != nil {
+		// delete img on S3
+		return nil, uploadmodel.ErrCannotSaveFile(err)
+	}
 
 	return img, nil
 }
@@ -64,5 +73,6 @@ func getImageDimension(reader io.Reader) (int, int, error) {
 		log.Println("err: ", err)
 		return 0, 0, err
 	}
+
 	return img.Width, img.Height, nil
 }

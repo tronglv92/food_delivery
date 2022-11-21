@@ -4,13 +4,13 @@ import (
 	"context"
 	// "context"
 	"fmt"
+	"food_delivery/plugin/fcm"
 	goservice "food_delivery/plugin/go-sdk"
-	"food_delivery/plugin/go-sdk/plugin/fcm"
 	"log"
 )
 
 var (
-	deviceToken = "dn2k1g_Cutc:APA91bG88Pfb2Y7bhmifBIhRTm1p0uVcHBtDwa3LRTyLUq2vdguNC2ORk5BYvog1zsIHxZ5WDSBx3po7wU6eUXGfncYkeKoXx6sqld3JX_YbLAXEc1tL4P55a0MNi4GCJgnMXCLZclPv"
+	deviceToken = "c_GPTomvTpWGXiU-Y83w4y:APA91bHDrHpIQai5zgeWVghYEtfKEgWa2PlXPcPkXRdZhMy9D_RVnXSP2A5qN-T-2oS3IUb4s664yzZ-ukBbrJwpdf30q38QEzIAixZbfx9b53SFwwptv4SJpqM4Z_igBL-8HZ1I3YVu"
 )
 
 func main() {

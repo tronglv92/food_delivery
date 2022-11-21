@@ -4,7 +4,7 @@ import (
 	"context"
 	"food_delivery/common"
 	"food_delivery/component/asyncjob"
-	restaurantstorage "food_delivery/module/restaurant/storage"
+	restaurantstorage "food_delivery/module/restaurant/storage/gorm"
 	"food_delivery/plugin/pubsub"
 	appnats "food_delivery/plugin/pubsub/nats"
 	"food_delivery/plugin/storage/sdkgorm"

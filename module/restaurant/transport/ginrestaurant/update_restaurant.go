@@ -4,7 +4,7 @@ import (
 	"food_delivery/common"
 	restaurantbiz "food_delivery/module/restaurant/biz"
 	restaurantmodel "food_delivery/module/restaurant/model"
-	restaurantstorage "food_delivery/module/restaurant/storage"
+	restaurantstorage "food_delivery/module/restaurant/storage/gorm"
 	"net/http"
 
 	goservice "food_delivery/plugin/go-sdk"
