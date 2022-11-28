@@ -1,0 +1,31 @@
+syntax = "proto3";
+package demo;
+
+import "google/api/annotations.proto";
+option go_package="user/";
+
+message DeviceTokenRequest {
+  int32 userId = 1;
+}
+
+message DeviceToken {
+  string id = 1;
+  int32 userId = 2;
+  int32 isProduction = 3;
+  string os = 4;
+  string token = 5;
+  string deviceId = 6;
+}
+
+message DeviceTokenResponse {
+  repeated DeviceToken deviceTokens = 1;
+}
+
+service DeviceTokenService {
+  rpc GetDeviceTokenId(DeviceTokenRequest) returns (DeviceTokenResponse) {
+    option (google.api.http) = {
+      post: "/v1/example/get-devices-token-id"
+      body: "*"
+    };
+  };
+}

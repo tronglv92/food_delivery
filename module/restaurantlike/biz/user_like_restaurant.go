@@ -2,7 +2,6 @@ package rstlikebiz
 
 import (
 	"context"
-	"food_delivery/common"
 	restaurantlikemodel "food_delivery/module/restaurantlike/model"
 	"food_delivery/plugin/pubsub"
 )
@@ -34,20 +33,20 @@ func NewUserLikeRestaurantBiz(
 	}
 }
 func (biz *userLikeRestaurantBiz) LikeRestaurant(ctx context.Context, data *restaurantlikemodel.Like) error {
-	liked, err := biz.store.CheckUserLike(ctx, data.UserId, data.RestaurantId)
-	if err != nil && err != common.ErrRecordNotFound {
-		return restaurantlikemodel.ErrCannotLikeRestaurant(err)
-	}
+	// liked, err := biz.store.CheckUserLike(ctx, data.UserId, data.RestaurantId)
+	// if err != nil && err != common.ErrRecordNotFound {
+	// 	return restaurantlikemodel.ErrCannotLikeRestaurant(err)
+	// }
 
-	if liked {
-		return restaurantlikemodel.ErrUserAlreadyLikedRestaurant(nil)
-	}
+	// if liked {
+	// 	return restaurantlikemodel.ErrUserAlreadyLikedRestaurant(nil)
+	// }
 
-	err = biz.store.Create(ctx, data)
+	// err = biz.store.Create(ctx, data)
 
-	if err != nil {
-		return restaurantlikemodel.ErrCannotLikeRestaurant(err)
-	}
+	// if err != nil {
+	// 	return restaurantlikemodel.ErrCannotLikeRestaurant(err)
+	// }
 
 	// // Side effect
 	// go func() {
@@ -67,10 +66,12 @@ func (biz *userLikeRestaurantBiz) LikeRestaurant(ctx context.Context, data *rest
 	// }()
 	// newMessage := pubsub.NewMessage(data)
 	newMessage := pubsub.NewMessage(map[string]interface{}{
-		"user_id":       data.UserId,
-		"restaurant_id": data.RestaurantId,
+		// "user_id":       data.UserId,
+		// "restaurant_id": data.RestaurantId,
+		"restaurant_id": "hello restaurant",
 	})
-	_ = biz.ps.Publish(ctx, common.TopicUserLikeRestaurant, newMessage)
+	done := make(chan bool)
+	_ = biz.ps.Publish(done, "test-exchange", "test-key", newMessage)
 
 	return nil
 }

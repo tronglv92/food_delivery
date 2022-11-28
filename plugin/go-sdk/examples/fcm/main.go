@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	deviceToken = "c_GPTomvTpWGXiU-Y83w4y:APA91bHDrHpIQai5zgeWVghYEtfKEgWa2PlXPcPkXRdZhMy9D_RVnXSP2A5qN-T-2oS3IUb4s664yzZ-ukBbrJwpdf30q38QEzIAixZbfx9b53SFwwptv4SJpqM4Z_igBL-8HZ1I3YVu"
+	deviceToken = "cYByoEGcR9SNpFAhGy4dan:APA91bH_HkTS6OwCxXk4o-QLBqZVTLuLHnvMtvS08s6XQzo_MOlhG2b_8TsXnDJ9LuJD8n5raMOjb2I4v-uki8p0bjJoOH2fq6d_K7ewH4Cvm3jd4Zt6nLNFKW8-hoS6ossV8ZYfGiRq"
 )
 
 func main() {

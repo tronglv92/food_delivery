@@ -33,15 +33,21 @@ func NewFullErrorResponse(statusCode int, root error, msg, log, key string) *App
 		Key:        key,
 	}
 }
-func NewUnauthorized(root error, msg, key string) *AppError {
+func NewUnauthorized(root error, msg, log, key string) *AppError {
 	return &AppError{
 		StatusCode: http.StatusUnauthorized,
 		RootErr:    root,
 		Message:    msg,
 		Key:        key,
+		Log:        log,
 	}
 }
-
+func NewCusUnauthorizedError(root error, msg string, key string) *AppError {
+	if root != nil {
+		return NewUnauthorized(root, msg, root.Error(), key)
+	}
+	return NewUnauthorized(errors.New(msg), msg, msg, key)
+}
 func NewCustomError(root error, msg string, key string) *AppError {
 	if root != nil {
 		return NewErrorResponse(root, msg, root.Error(), key)

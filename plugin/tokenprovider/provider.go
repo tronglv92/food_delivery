@@ -3,20 +3,25 @@ package tokenprovider
 import (
 	"errors"
 	"food_delivery/common"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 type Provider interface {
-	Generate(data TokenPayload, expiry int) (Token, error)
+	Generate(data TokenPayload, expiry time.Duration) (Token, error)
 	Validate(token string) (TokenPayload, error)
 }
 
 type TokenPayload interface {
 	Role() string
 	UserId() int
+	ID() uuid.UUID
 }
 
 type Token interface {
 	GetToken() string
+	GetExpire() int
 }
 
 var (
@@ -34,5 +39,10 @@ var (
 		errors.New("invalid token provided"),
 		"invalid token provided",
 		"ErrInvalidToken",
+	)
+	ErrExpiredToken = common.NewCustomError(
+		errors.New("token has expired"),
+		"token has expired",
+		"ErrExpiredToken",
 	)
 )

@@ -39,14 +39,16 @@ func MainRoute(router *gin.Engine, sc goservice.ServiceContext) {
 
 		v1.POST("/register", usergin.Register(sc))
 		v1.POST("/auth", usergin.Login(sc))
+		v1.POST("/renew-token", usergin.RenewAccessToken(sc))
 		v1.GET("/profile", middleware.RequiredAuth(sc, userStore), usergin.Profile(sc))
 		v1.POST("/upload", middleware.RequiredAuth(sc, userStore), ginupload.Upload(sc))
 		v1.POST("/put-device-token", middleware.RequiredAuth(sc, userStore), gindevicetoken.PutDeviceToken(sc))
+		v1.POST("/remove-token-by-user/:id", usergin.RemoveRedisToken(sc))
 		restaurants := v1.Group("/restaurants")
 		{
 			restaurants.POST("", middleware.RequiredAuth(sc, userStore), ginrestaurant.CreateRestaurant(sc))
 
-			restaurants.GET("", ginrestaurant.ListRestaurant(sc))
+			restaurants.GET("", middleware.RequiredAuth(sc, userStore), ginrestaurant.ListRestaurant(sc))
 			restaurants.PUT("/:id", ginrestaurant.UpdateRestaurantHandler(sc))
 			restaurants.DELETE("/:id", ginrestaurant.DeleteRestaurant(sc))
 			restaurants.GET("/:id", ginrestaurant.GetRestaurant(sc))

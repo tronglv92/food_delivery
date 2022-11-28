@@ -2,7 +2,6 @@ package rstlikebiz
 
 import (
 	"context"
-	"food_delivery/common"
 	restaurantlikemodel "food_delivery/module/restaurantlike/model"
 	"food_delivery/plugin/pubsub"
 )
@@ -63,11 +62,12 @@ func (biz *userDislikeRestaurantBiz) DislikeRestaurant(ctx context.Context, user
 	// 	}
 	// }()
 
-	newMessage := pubsub.NewMessage(map[string]interface{}{
-		"user_id":       userId,
-		"restaurant_id": restaurantId,
-	})
-	biz.ps.Publish(ctx, common.TopicUserDislikeRestaurant, newMessage)
+	// PUBSUB
+	// newMessage := pubsub.NewMessage(map[string]interface{}{
+	// 	"user_id":       userId,
+	// 	"restaurant_id": restaurantId,
+	// })
+	// biz.ps.Publish(ctx, common.TopicUserDislikeRestaurant, newMessage)
 
 	return nil
 

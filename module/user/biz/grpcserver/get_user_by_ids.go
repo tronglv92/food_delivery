@@ -6,17 +6,19 @@ import (
 	user "food_delivery/proto"
 )
 
-type UserStore interface {
+type UserStorage interface {
+	// user/storage/gorm/get: GetUsers
 	GetUsers(ctx context.Context, ids []int) ([]common.SimpleUser, error)
 }
-type grpcStore struct {
-	dbStore UserStore
+type userGRPCBusiness struct {
+	dbStore UserStorage
 }
 
-func NewGRPCStore(dbStore UserStore) *grpcStore {
-	return &grpcStore{dbStore: dbStore}
+func NewUserGRPCBusiness(dbStore UserStorage) *userGRPCBusiness {
+	return &userGRPCBusiness{dbStore: dbStore}
 }
-func (s *grpcStore) GetUserByIds(ctx context.Context, request *user.UserRequest) (*user.UserResponse, error) {
+
+func (s *userGRPCBusiness) GetUserByIds(ctx context.Context, request *user.UserRequest) (*user.UserResponse, error) {
 	userIds := make([]int, len(request.GetUserIds()))
 	for i := range userIds {
 		userIds[i] = int(request.GetUserIds()[i])

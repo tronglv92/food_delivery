@@ -6,14 +6,18 @@ import (
 	"food_delivery/common"
 	"food_delivery/middleware"
 	"food_delivery/plugin/aws"
+	grpcService "food_delivery/plugin/client_remotecall/grpc"
+	appgrpcDeviceToken "food_delivery/plugin/client_remotecall/grpc/devicetoken"
+	appgrpcUser "food_delivery/plugin/client_remotecall/grpc/user"
+	"food_delivery/plugin/client_remotecall/restful"
 	"food_delivery/plugin/fcm"
-	appnats "food_delivery/plugin/pubsub/nats"
-	"food_delivery/plugin/pubsub/pblocal"
-	appgrpc "food_delivery/plugin/remotecall/grpc"
-	"food_delivery/plugin/remotecall/restful"
+	rabbitmq "food_delivery/plugin/pubsub/rabbitmq"
 
+	fcmGrpcServer "food_delivery/module/devicetoken/biz/grpcservice"
+	devicetokenstorage "food_delivery/module/devicetoken/storage/gorm"
+	userGrpcBiz "food_delivery/module/user/biz/grpcserver"
 	userstorage "food_delivery/module/user/storage/gorm"
-	usergrpc "food_delivery/module/user/storage/grpc"
+
 	"food_delivery/plugin/jaeger"
 	"food_delivery/plugin/storage/sdkes"
 	"food_delivery/plugin/storage/sdkgorm"
@@ -43,15 +47,17 @@ func newService() goservice.Service {
 		goservice.WithInitRunnable(sdkmgo.NewMongoDB("mongoDB", common.DBMongo)),
 		goservice.WithInitRunnable(jwt.NewTokenJWTProvider(common.JWTProvider)),
 		goservice.WithInitRunnable(restful.NewUserService()),
-		goservice.WithInitRunnable(pblocal.NewPubSub(common.PluginPubSub)),
-		goservice.WithInitRunnable(appnats.NewNATS(common.PluginNATS)),
+		// goservice.WithInitRunnable(pblocal.NewPubSub(common.PluginPubSub)),
+		// goservice.WithInitRunnable(appnats.NewNATS(common.PluginNATS)),
 		goservice.WithInitRunnable(sdkredis.NewRedisDB("redis", common.PluginRedis)),
 		goservice.WithInitRunnable(sdkes.NewES("elastic", common.PluginES)),
 		goservice.WithInitRunnable(jaeger.NewJaeger("g05-Food-Delivery")),
 		goservice.WithInitRunnable(aws.New(common.PluginAWS)),
 		goservice.WithInitRunnable(fcm.New(common.PluginFCM)),
-		goservice.WithInitRunnable(appgrpc.NewGRPCServer(common.PluginGrpcServer)),
-		goservice.WithInitRunnable(appgrpc.NewUserClient(common.PluginGrpcUserClient)),
+		goservice.WithInitRunnable(rabbitmq.NewRabbitMQ(common.PluginRabbitMQ)),
+		goservice.WithInitRunnable(grpcService.NewGRPCServer(common.PluginGrpcServer)),
+		goservice.WithInitRunnable(appgrpcUser.NewUserClient(common.PluginGrpcUserClient)),
+		goservice.WithInitRunnable(appgrpcDeviceToken.NewDeviceTokenClient(common.PluginGrpcDeviceTokenClient)),
 	)
 
 	return service
@@ -69,7 +75,9 @@ var rootCmd = &cobra.Command{
 			SetRegisterHdl(hdl func(*grpc.Server))
 		}).SetRegisterHdl(func(server *grpc.Server) {
 			dbConn := service.MustGet(common.DBMain).(*gorm.DB)
-			user.RegisterUserServiceServer(server, usergrpc.NewGRPCStore(userstorage.NewSQLStore(dbConn)))
+			user.RegisterUserServiceServer(server, userGrpcBiz.NewUserGRPCBusiness(userstorage.NewSQLStore(dbConn)))
+			user.RegisterDeviceTokenServiceServer(server, fcmGrpcServer.NewDeviceTokenGRPCBusiness(devicetokenstorage.NewSQLStore(dbConn)))
+
 		})
 
 		initServiceWithRetry(service, 10)
@@ -97,7 +105,7 @@ func Execute() {
 	rootCmd.AddCommand(cronjob)
 	rootCmd.AddCommand(startSubUserLikedRestaurantCmd)
 	rootCmd.AddCommand(startSubUserDislikedRestaurantCmd)
-
+	rootCmd.AddCommand(startSubSendNotificationCmd)
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

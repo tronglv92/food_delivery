@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const cacheKey = "user:%d"
+
 
 func (c *authUserCached) FindUser(ctx context.Context, conditions map[string]interface{}, moreInfo ...string) (*usermodel.User, error) {
 	var user usermodel.User

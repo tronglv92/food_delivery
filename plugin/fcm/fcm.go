@@ -67,7 +67,7 @@ func (s *fcmClient) Name() string {
 }
 
 func (s *fcmClient) InitFlags() {
-	flag.StringVar(&s.apiKey, fmt.Sprintf("%s-api-key", s.Name()), "", "firebase cloud messaging api key")
+	flag.StringVar(&s.apiKey, fmt.Sprintf("%s-api-key", s.Name()), "AAAAEggS_EA:APA91bFRYVH9Qg42tjYvC5rOgqah64Cw8dMUGMs4xcezTAlal_UenVll-_0kEFJCI4N_aODOVDz8TGSQFUzZeq5tsdIbmxFgsRqUdNEsQCQFdXxhdaxEECDtw1Vtdm7k7omP5s_zuCos", "firebase cloud messaging api key")
 }
 
 func (s *fcmClient) Configure() error {

@@ -35,10 +35,10 @@ func ListRestaurant(sc goservice.ServiceContext) gin.HandlerFunc {
 			panic(common.ErrInvalidRequest(err))
 		}
 		db := sc.MustGet(common.DBMain).(*gorm.DB)
-		_ = restaurantstorage.NewSQLStore(db)
+		esStore := restaurantstorage.NewSQLStore(db)
 
 		client := sc.MustGet(common.PluginES).(*elastic.Client)
-		esStore := resstorageES.NewESStore(client)
+		_ = resstorageES.NewESStore(client)
 
 		// likeStore := restaurantlikestorage.NewSQLStore(db)
 

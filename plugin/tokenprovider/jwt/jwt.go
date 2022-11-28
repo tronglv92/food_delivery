@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"food_delivery/common"
@@ -23,7 +24,9 @@ type token struct {
 func (t *token) GetToken() string {
 	return t.Token
 }
-
+func (t *token) GetExpire() int {
+	return t.Expiry
+}
 func NewTokenJWTProvider(prefix string) *jwtProvider {
 	return &jwtProvider{
 		prefix: prefix,
@@ -35,17 +38,18 @@ type myClaims struct {
 	jwt.StandardClaims
 }
 
-func (j *jwtProvider) Generate(data tokenprovider.TokenPayload, expiry int) (tokenprovider.Token, error) {
+func (j *jwtProvider) Generate(data tokenprovider.TokenPayload, duration time.Duration) (tokenprovider.Token, error) {
 	// generate the JWT
 	now := time.Now()
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, myClaims{
 		common.TokenPayload{
-			UID:   data.UserId(),
-			URole: data.Role(),
+			UID:     data.UserId(),
+			URole:   data.Role(),
+			TokenID: data.ID(),
 		},
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Local().Add(time.Second * time.Duration(expiry)).Unix(),
-			IssuedAt:  time.Now().Local().Unix(),
+			ExpiresAt: time.Now().UTC().Add(duration).Unix(),
+			IssuedAt:  time.Now().UTC().Unix(),
 			Id:        fmt.Sprintf("%d", now.UnixNano()),
 		},
 	})
@@ -58,17 +62,28 @@ func (j *jwtProvider) Generate(data tokenprovider.TokenPayload, expiry int) (tok
 	// return the token
 	return &token{
 		Token:   myToken,
-		Expiry:  expiry,
+		Expiry:  int(duration.Seconds()),
 		Created: time.Now(),
 	}, nil
 }
 
 func (j *jwtProvider) Validate(myToken string) (tokenprovider.TokenPayload, error) {
-	res, err := jwt.ParseWithClaims(myToken, &myClaims{}, func(t *jwt.Token) (interface{}, error) {
+
+	keyFunc := func(t *jwt.Token) (interface{}, error) {
+		_, ok := t.Method.(*jwt.SigningMethodHMAC)
+		if !ok {
+			return nil, tokenprovider.ErrInvalidToken
+		}
 		return []byte(j.secret), nil
-	})
+	}
+	res, err := jwt.ParseWithClaims(myToken, &myClaims{}, keyFunc)
 
 	if err != nil {
+		verr, ok := err.(*jwt.ValidationError)
+		if ok && errors.Is(verr.Inner, tokenprovider.ErrExpiredToken) {
+			return nil, tokenprovider.ErrExpiredToken
+		}
+
 		return nil, tokenprovider.ErrInvalidToken
 	}
 

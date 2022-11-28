@@ -31,7 +31,7 @@ func UserLikeRestaurant(sc goservice.ServiceContext) gin.HandlerFunc {
 		}
 
 		db := sc.MustGet(common.DBMain).(*gorm.DB)
-		ps := sc.MustGet(common.PluginNATS).(pubsub.Pubsub)
+		ps := sc.MustGet(common.PluginRabbitMQ).(pubsub.Pubsub)
 		store := restaurantlikestorage.NewSQLStore(db)
 		// incStore := restaurantlikestorage.NewSQLStore(db)
 

@@ -3,6 +3,7 @@ package usermodel
 import (
 	"errors"
 	"food_delivery/common"
+	"food_delivery/plugin/tokenprovider"
 )
 
 const EntityName = "User"
@@ -56,17 +57,20 @@ func (UserLogin) TableName() string {
 	return User{}.TableName()
 }
 
-// type Account struct {
-// 	AccessToken  *tokenprovider.Token `json:"access_token"`
-// 	RefreshToken *tokenprovider.Token `json:"refresh_token"`
-// }
+type RemoveTokenRequest struct {
+	UserId int `json:"user_id" form:"user_id" `
+}
+type Account struct {
+	AccessToken  *tokenprovider.Token `json:"access_token"`
+	RefreshToken *tokenprovider.Token `json:"refresh_token"`
+}
 
-// func NewAccount(at, rt *tokenprovider.Token) *Account {
-// 	return &Account{
-// 		AccessToken:  at,
-// 		RefreshToken: rt,
-// 	}
-// }
+func NewAccount(at, rt *tokenprovider.Token) *Account {
+	return &Account{
+		AccessToken:  at,
+		RefreshToken: rt,
+	}
+}
 
 var (
 	ErrUsernameOrPasswordInvalid = common.NewCustomError(
@@ -76,5 +80,8 @@ var (
 	)
 	ErrEmailExisted = common.NewCustomError(
 		errors.New("email has already existed"), "email has already existed", "ErrEmailExisted",
+	)
+	ErrTokenNotFindInRedis = common.NewCustomError(
+		errors.New("token not find in redis"), "token not find in redis", "ErrTokenNotFindInRedis",
 	)
 )

@@ -3,65 +3,31 @@ package userbiz
 import (
 	"context"
 	"food_delivery/common"
-	"food_delivery/plugin/tokenprovider"
 
 	usermodel "food_delivery/module/user/model"
 )
 
-type LoginStorage interface {
-	FindUser(ctx context.Context, conditions map[string]interface{}, moreInfo ...string) (*usermodel.User, error)
-}
-type loginBusiness struct {
-	// appCtx        appctx.AppContext
-	storeUser     LoginStorage
-	tokenProvider tokenprovider.Provider
-	hasher        Hasher
-	expiry        int
+type LoginRepo interface {
+	Login(ctx context.Context, userAgent string, clientIp string, data *usermodel.UserLogin) (*usermodel.Account, error)
 }
 
-func NewLoginBusiness(storeUser LoginStorage, tokenProvider tokenprovider.Provider, hasher Hasher, expiry int) *loginBusiness {
-	return &loginBusiness{
-		storeUser:     storeUser,
-		tokenProvider: tokenProvider,
-		hasher:        hasher,
-		expiry:        expiry,
-	}
+type loginBiz struct {
+	repo LoginRepo
 }
 
-// 1. Find user, email
-// 2. Hash pass from input and compare with pass in db
-// 3. Provider: issue JWT token for client
-// 3.1 Access token and refresh token
-// 4. Return tokens
-func (business *loginBusiness) Login(ctx context.Context, data *usermodel.UserLogin) (tokenprovider.Token, error) {
-	user, err := business.storeUser.FindUser(ctx, map[string]interface{}{"email": data.Email})
-
+func NewLoginBiz(repo LoginRepo) *loginBiz {
+	return &loginBiz{repo: repo}
+}
+func (biz *loginBiz) Login(ctx context.Context, userAgent string, clientIp string, data *usermodel.UserLogin) (*usermodel.Account, error) {
+	user, err := biz.repo.Login(ctx, userAgent, clientIp, data)
 	if err != nil {
-		return nil, usermodel.ErrUsernameOrPasswordInvalid
+		return nil, common.ErrCannotCreateEntity(usermodel.EntityName, err)
 	}
 
-	passHashed := business.hasher.Hash(data.Password + user.Salt)
-
-	if user.Password != passHashed {
-		return nil, usermodel.ErrUsernameOrPasswordInvalid
-	}
-
-	payload := &common.TokenPayload{
-		UID:   user.Id,
-		URole: user.Role,
-	}
-
-	accessToken, err := business.tokenProvider.Generate(payload, business.expiry)
-	if err != nil {
-		return nil, common.ErrInternal(err)
-	}
-
-	// refreshToken,err:=business.tokenProvider.Generate(payload,business.tkCfg.GetRtExp())
-	// if err!=nil{
-	// 	return nil,common.ErrInternal(err)
-	// }
-
-	//account:=usermodel.NewAccount(accessToken,refreshToken)
-	return accessToken, nil
-
+	// newMessage := pubsub.NewMessage(map[string]interface{}{
+	// 	"user_id":       data.UserId,
+	// 	"restaurant_id": data.RestaurantId,
+	// })
+	// _ = biz.ps.Publish(context, common.TopicUserLikeRestaurant, newMessage)
+	return user, nil
 }

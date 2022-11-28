@@ -14,11 +14,13 @@ require (
 	github.com/go-redis/redis/v7 v7.4.1
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-resty/resty/v2 v2.7.0
+	github.com/google/uuid v1.1.2
 	github.com/googollee/go-socket.io v1.6.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.13.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/nats-io/nats.go v1.19.0
 	github.com/olivere/elastic/v7 v7.0.8
+	github.com/rabbitmq/amqp091-go v1.5.0
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.0
 	go.mongodb.org/mongo-driver v1.10.0

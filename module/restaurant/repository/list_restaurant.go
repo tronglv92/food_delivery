@@ -13,6 +13,9 @@ type ListRestaurantRepo interface {
 		paging *common.Paging,
 		moreKeys ...string) ([]restaurantmodel.Restaurant, error)
 }
+type UserStore interface {
+	GetUsers(ctx context.Context, ids []int) ([]common.SimpleUser, error)
+}
 type LikeRestaurantStore interface {
 	GetRestaurantLikes(ctx context.Context, ids []int) (map[int]int, error)
 }
@@ -20,10 +23,6 @@ type listRestaurantRepo struct {
 	store  ListRestaurantRepo
 	uStore UserStore
 	// likeStore LikeRestaurantStore
-}
-
-type UserStore interface {
-	GetUsers(ctx context.Context, ids []int) ([]common.SimpleUser, error)
 }
 
 func NewListRestaurantRepo(store ListRestaurantRepo, uStore UserStore) *listRestaurantRepo {

@@ -1,6 +1,11 @@
 package common
 
-import "log"
+import (
+	"log"
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type DbType int
 
@@ -9,19 +14,21 @@ const (
 	DbTypeUser       = 2
 )
 const (
-	CurrentUser          = "user"
-	DBMain               = "mysql"
-	DBMongo              = "mongo"
-	PluginUserService    = "user-service"
-	JWTProvider          = "jwt"
-	PluginPubSub         = "pubsub"
-	PluginNATS           = "nats"
-	PluginRedis          = "redis"
-	PluginES             = "elastic-search"
-	PluginGrpcServer     = "grpc-server"
-	PluginGrpcUserClient = "grpc-user-client"
-	PluginAWS            = "aws"
-	PluginFCM            = "fcm"
+	CurrentUser                 = "user"
+	DBMain                      = "mysql"
+	DBMongo                     = "mongo"
+	PluginUserService           = "user-service"
+	JWTProvider                 = "jwt"
+	PluginPubSub                = "pubsub"
+	PluginNATS                  = "nats"
+	PluginRedis                 = "redis"
+	PluginES                    = "elastic-search"
+	PluginGrpcServer            = "grpc-server"
+	PluginGrpcUserClient        = "grpc-user-client"
+	PluginGrpcDeviceTokenClient = "grpc-devicetoken-client"
+	PluginAWS                   = "aws"
+	PluginFCM                   = "fcm"
+	PluginRabbitMQ              = "rabbitmq"
 
 	TopicUserLikeRestaurant    = "restaurant.liked"
 	TopicUserDislikeRestaurant = "restaurant.disliked"
@@ -31,6 +38,11 @@ const (
 const (
 	DBMongoName     = "food_delivery"
 	UsersCollection = "Users"
+)
+
+const (
+	AccessTokenDuration  = 1 * time.Hour   // 1 h
+	RefreshTokenDuration = 3 * time.Minute // 30 days
 )
 
 // const (
@@ -51,8 +63,9 @@ func AppRecover() {
 }
 
 type TokenPayload struct {
-	UID   int    `json:"user_id"`
-	URole string `json:"role"`
+	UID     int       `json:"user_id"`
+	URole   string    `json:"role"`
+	TokenID uuid.UUID `json:"id"`
 }
 
 func (p TokenPayload) UserId() int {
@@ -61,4 +74,7 @@ func (p TokenPayload) UserId() int {
 
 func (p TokenPayload) Role() string {
 	return p.URole
+}
+func (p TokenPayload) ID() uuid.UUID {
+	return p.TokenID
 }

@@ -8,6 +8,8 @@ import (
 	"sync"
 )
 
+const cacheKey = "user:%d"
+
 type UserStore interface {
 	FindUser(ctx context.Context, conditions map[string]interface{}, moreInfo ...string) (*usermodel.User, error)
 }

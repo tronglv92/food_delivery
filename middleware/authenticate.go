@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"food_delivery/common"
 	usermodel "food_delivery/module/user/model"
+	"food_delivery/plugin/go-sdk/logger"
 	"food_delivery/plugin/tokenprovider"
 	"strings"
 
@@ -17,6 +18,7 @@ import (
 
 type AuthenStore interface {
 	FindUser(ctx context.Context, conditions map[string]interface{}, moreInfo ...string) (*usermodel.User, error)
+	FindAccessToken(ctx context.Context, conditions map[string]interface{}, moreInfo ...string) (*common.RedisToken, error)
 }
 
 func ErrWrongAuthHeader(err error) *common.AppError {
@@ -39,10 +41,11 @@ func extractTokenFromHeaderString(s string) (string, error) {
 
 // 1. Get Token from header
 // 2. Validate token and parse to payload
-// 3. From the token payload, we use user_id to find from DB
+// 3. Check whitelist redis accesstoken and refreshtoken exit
+// 4. From the token payload, we use user_id to find from DB
 func RequiredAuth(sc goservice.ServiceContext, authStore AuthenStore) func(c *gin.Context) {
 	tokenProvider := sc.MustGet(common.JWTProvider).(tokenprovider.Provider)
-
+	logger := logger.GetCurrent().GetLogger("middleware.authenticate")
 	return func(c *gin.Context) {
 
 		token, err := extractTokenFromHeaderString(c.GetHeader("Authorization"))
@@ -53,11 +56,21 @@ func RequiredAuth(sc goservice.ServiceContext, authStore AuthenStore) func(c *gi
 
 		// db := appCtx.GetMainDBConnection()
 		// store := userstore.NewSQLStore(db)
-
 		payload, err := tokenProvider.Validate(token)
 		if err != nil {
-			panic(err)
+			panic(common.NewCusUnauthorizedError(err, "token invalid", "ErrTokenInvalid"))
 		}
+
+		// authStore.ClearRedisToken(c.Request.Context(), map[string]interface{}{"id": payload.UserId()})
+
+		_, err = authStore.FindAccessToken(c.Request.Context(), map[string]interface{}{"id": payload.UserId(), "access_token": token})
+		logger.Debugf("err: %v", err)
+		if err != nil {
+
+			panic(common.NewCusUnauthorizedError(err, "token invalid", "ErrTokenInvalid"))
+
+		}
+
 		ctx, span := trace.StartSpan(c.Request.Context(), "middleware.RequiredAuth")
 		user, err := authStore.FindUser(ctx, map[string]interface{}{"id": payload.UserId()})
 		span.End()
