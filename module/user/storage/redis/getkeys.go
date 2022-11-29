@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-const cachePrefixAT = "user:%d:*"
+
 
 func (c *authUserCached) GetKeys(ctx context.Context, conditions map[string]interface{}) ([]string, error) {
 
@@ -14,15 +14,17 @@ func (c *authUserCached) GetKeys(ctx context.Context, conditions map[string]inte
 
 	key := fmt.Sprintf(cachePrefixAT, userId)
 
+	var cursor uint64
 	for {
 
-		scanCmd := c.cacheStore.Scan(ctx, 0, key, 100)
-		keys, cursor, err := scanCmd.Result()
+		scanCmd := c.cacheStore.Scan(ctx, cursor, key, 2)
+		keys, cs, err := scanCmd.Result()
 		if err != nil {
 			return nil, err
 		}
+		cursor = cs
 		results = append(results, keys...)
-		fmt.Printf("cursor ", cursor)
+		// fmt.Printf("cursor %v", cursor)
 		if cursor == 0 {
 			break
 		}

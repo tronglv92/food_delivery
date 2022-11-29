@@ -8,26 +8,31 @@ import (
 	"time"
 )
 
-const cacheKeyAT = "user:%d:%v"
-const cacheKeyRT = "user:refreshtoken:%d"
 
-func (c *authUserCached) SaveToken(ctx context.Context,
+
+func (c *authUserCached) SaveTokens(ctx context.Context,
 	conditions map[string]interface{},
 	moreInfo ...string) error {
 	userId := conditions["id"].(int)
-	accessToken := conditions["access_token"].(tokenprovider.Token)
-	// refreshToken := conditions["refresh_token"].(tokenprovider.Token)
+	accessToken := conditions[common.KeyRedisAccessToken].(tokenprovider.Token)
+	refreshToken := conditions[common.KeyRedisRefreshToken].(tokenprovider.Token)
 	keyAT := fmt.Sprintf(cacheKeyAT, userId, accessToken.GetToken())
-	fmt.Printf("keyAT ", keyAT)
-	// keyRT := fmt.Sprintf(cacheKeyRT, userId)
+
+	keyRT := fmt.Sprintf(cacheKeyRT, userId, refreshToken.GetToken())
 
 	redisAccessToken := common.RedisToken{
 		Token:   accessToken.GetToken(),
 		Created: time.Now(),
 		Expiry:  accessToken.GetExpire(),
 	}
+
+	redisRefreshToken := common.RedisToken{
+		Token:   refreshToken.GetToken(),
+		Created: time.Now(),
+		Expiry:  refreshToken.GetExpire(),
+	}
 	_ = c.cacheStore.Set(ctx, keyAT, redisAccessToken, time.Duration(accessToken.GetExpire()*int(time.Second)))
-	// _ = c.cacheStore.Set(ctx, keyRT, refreshToken.GetToken(), time.Duration(refreshToken.GetExpire()*int(time.Second)))
+	_ = c.cacheStore.Set(ctx, keyRT, redisRefreshToken, time.Duration(refreshToken.GetExpire()*int(time.Second)))
 
 	return nil
 }

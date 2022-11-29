@@ -63,13 +63,14 @@ func RequiredAuth(sc goservice.ServiceContext, authStore AuthenStore) func(c *gi
 
 		// authStore.ClearRedisToken(c.Request.Context(), map[string]interface{}{"id": payload.UserId()})
 
-		_, err = authStore.FindAccessToken(c.Request.Context(), map[string]interface{}{"id": payload.UserId(), "access_token": token})
-		logger.Debugf("err: %v", err)
+		accessToken, err := authStore.FindAccessToken(c.Request.Context(), map[string]interface{}{"id": payload.UserId(), common.KeyRedisAccessToken: token})
+
 		if err != nil {
 
 			panic(common.NewCusUnauthorizedError(err, "token invalid", "ErrTokenInvalid"))
 
 		}
+		logger.Debugf("accessToken: %v", accessToken)
 
 		ctx, span := trace.StartSpan(c.Request.Context(), "middleware.RequiredAuth")
 		user, err := authStore.FindUser(ctx, map[string]interface{}{"id": payload.UserId()})

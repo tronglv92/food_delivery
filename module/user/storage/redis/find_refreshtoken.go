@@ -3,16 +3,22 @@ package userstore
 import (
 	"context"
 	"fmt"
-	"food_delivery/plugin/tokenprovider"
+	"food_delivery/common"
 )
 
-func (c *authUserCached) FindRefreshToken(ctx context.Context, conditions map[string]interface{}, moreInfo ...string) (*tokenprovider.Token, error) {
-	var refreshToken tokenprovider.Token
+func (c *authUserCached) FindRefreshToken(ctx context.Context, conditions map[string]interface{}, moreInfo ...string) (*common.RedisToken, error) {
+	var redisRefreshToken *common.RedisToken
 
+	refreshToken := conditions[common.KeyRedisRefreshToken].(string)
 	userId := conditions["id"].(int)
-	key := fmt.Sprintf(cacheKeyRT, userId)
 
-	_ = c.cacheStore.Get(ctx, key, &refreshToken)
+	key := fmt.Sprintf(cacheKeyRT, userId, refreshToken)
 
-	return &refreshToken, nil
+	err := c.cacheStore.Get(ctx, key, &redisRefreshToken)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return redisRefreshToken, nil
 }

@@ -80,6 +80,7 @@ func (data *SessionCreate) Validate() error {
 
 type RenewAccessTokenRequest struct {
 	Refreshtoken string `json:"refresh_token" form:"refresh_token" `
+	AccessToken  string `json:"access_token" form:"access_token"`
 }
 
 func (RenewAccessTokenRequest) TableName() string {
@@ -105,12 +106,12 @@ var (
 		errors.New("ID is empty"), "ID is empty", "ErrIdEmpty",
 	)
 	ErrRefreshTokenEmpty = common.NewCustomError(
-		errors.New("Refresh Token is empty"), "Refresh Token is empty", "ErrRefreshTokenEmpty",
+		errors.New("refresh Token is empty"), "Refresh Token is empty", "ErrRefreshTokenEmpty",
 	)
 	ErrUserAgentEmpty = common.NewCustomError(
-		errors.New("User Agent is empty"), "User Agent is empty", "ErrUserAgentEmpty",
+		errors.New("user Agent is empty"), "User Agent is empty", "ErrUserAgentEmpty",
 	)
 	ErrClientIpEmpty = common.NewCustomError(
-		errors.New("Client IP is empty"), "Client IP is empty", "ErrClientIpEmpty",
+		errors.New("client IP is empty"), "Client IP is empty", "ErrClientIpEmpty",
 	)
 )

@@ -43,6 +43,8 @@ const (
 const (
 	AccessTokenDuration  = 1 * time.Hour   // 1 h
 	RefreshTokenDuration = 3 * time.Minute // 30 days
+	KeyRedisAccessToken  = "access_token"
+	KeyRedisRefreshToken = "refresh_token"
 )
 
 // const (

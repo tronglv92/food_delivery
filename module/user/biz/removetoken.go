@@ -4,7 +4,6 @@ import (
 	"context"
 	"food_delivery/common"
 	usermodel "food_delivery/module/user/model"
-	"food_delivery/plugin/go-sdk/logger"
 )
 
 type RedisRemoveTokenStorage interface {
@@ -21,7 +20,7 @@ func NewRemoveTokenBusiness(redisStorage RedisRemoveTokenStorage) *removeTokenBu
 	}
 }
 func (business *removeTokenBusiness) RemoveRedisToken(ctx context.Context, userId int) error {
-	logger := logger.GetCurrent().GetLogger("module.user.biz.removetoken")
+	// logger := logger.GetCurrent().GetLogger("module.user.biz.removetoken")
 	keys, err := business.redisStorage.GetKeys(ctx, map[string]interface{}{"id": userId})
 
 	if err != nil {
@@ -31,7 +30,7 @@ func (business *removeTokenBusiness) RemoveRedisToken(ctx context.Context, userI
 	if keys == nil {
 		return usermodel.ErrTokenNotFindInRedis
 	}
-	logger.Debugf("keys", keys)
+	// logger.Debugf("keys", keys)
 	_ = business.redisStorage.DelKeys(ctx, keys)
 
 	return nil

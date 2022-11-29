@@ -9,7 +9,7 @@ import (
 func (c *authUserCached) FindAccessToken(ctx context.Context, conditions map[string]interface{}, moreInfo ...string) (*common.RedisToken, error) {
 	var redisAccessToken *common.RedisToken
 
-	accessToken := conditions["access_token"].(string)
+	accessToken := conditions[common.KeyRedisAccessToken].(string)
 	userId := conditions["id"].(int)
 
 	key := fmt.Sprintf(cacheKeyAT, userId, accessToken)
