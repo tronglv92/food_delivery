@@ -18,7 +18,7 @@ import (
 
 type AuthenStore interface {
 	FindUser(ctx context.Context, conditions map[string]interface{}, moreInfo ...string) (*usermodel.User, error)
-	FindAccessToken(ctx context.Context, conditions map[string]interface{}, moreInfo ...string) (*common.RedisToken, error)
+	WLFindAccessToken(ctx context.Context, conditions map[string]interface{}, moreInfo ...string) (*common.RedisToken, error)
 }
 
 func ErrWrongAuthHeader(err error) *common.AppError {
@@ -63,7 +63,7 @@ func RequiredAuth(sc goservice.ServiceContext, authStore AuthenStore) func(c *gi
 
 		// authStore.ClearRedisToken(c.Request.Context(), map[string]interface{}{"id": payload.UserId()})
 
-		accessToken, err := authStore.FindAccessToken(c.Request.Context(), map[string]interface{}{"id": payload.UserId(), common.KeyRedisAccessToken: token})
+		accessToken, err := authStore.WLFindAccessToken(c.Request.Context(), map[string]interface{}{"id": payload.UserId(), common.KeyRedisAccessToken: token})
 
 		if err != nil {
 

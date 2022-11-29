@@ -7,8 +7,8 @@ import (
 )
 
 type RedisRemoveTokenStorage interface {
-	GetKeys(ctx context.Context, conditions map[string]interface{}) ([]string, error)
-	DelKeys(ctx context.Context, keys []string) error
+	WLGetKeys(ctx context.Context, conditions map[string]interface{}) ([]string, error)
+	WLDelKeys(ctx context.Context, keys []string) error
 }
 type removeTokenBusiness struct {
 	redisStorage RedisRemoveTokenStorage
@@ -21,7 +21,7 @@ func NewRemoveTokenBusiness(redisStorage RedisRemoveTokenStorage) *removeTokenBu
 }
 func (business *removeTokenBusiness) RemoveRedisToken(ctx context.Context, userId int) error {
 	// logger := logger.GetCurrent().GetLogger("module.user.biz.removetoken")
-	keys, err := business.redisStorage.GetKeys(ctx, map[string]interface{}{"id": userId})
+	keys, err := business.redisStorage.WLGetKeys(ctx, map[string]interface{}{"id": userId})
 
 	if err != nil {
 		return common.ErrInternal(err)
@@ -31,7 +31,7 @@ func (business *removeTokenBusiness) RemoveRedisToken(ctx context.Context, userI
 		return usermodel.ErrTokenNotFindInRedis
 	}
 	// logger.Debugf("keys", keys)
-	_ = business.redisStorage.DelKeys(ctx, keys)
+	_ = business.redisStorage.WLDelKeys(ctx, keys)
 
 	return nil
 }

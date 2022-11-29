@@ -15,13 +15,13 @@ import (
 // 	GetSession(ctx context.Context, condition map[string]interface{}, moreKeys ...string) (*sessionmodel.Session, error)
 // }
 type RedisTokenStorage interface {
-	FindRefreshToken(ctx context.Context,
+	WLFindRefreshToken(ctx context.Context,
 		conditions map[string]interface{},
 		moreInfo ...string) (*common.RedisToken, error)
-	SaveTokens(ctx context.Context,
+	WLSaveTokens(ctx context.Context,
 		conditions map[string]interface{},
 		moreInfo ...string) error
-	DelTokens(ctx context.Context,
+	WLDelTokens(ctx context.Context,
 		conditions map[string]interface{},
 		moreInfo ...string) error
 }
@@ -53,7 +53,7 @@ func (business *renewTokenRepo) RenewAccessToken(ctx context.Context, data *user
 		return nil, common.ErrInvalidRequest(err)
 	}
 	conditions := map[string]interface{}{"id": refreshPayload.UserId(), common.KeyRedisRefreshToken: data.Refreshtoken}
-	_, err = business.redisStore.FindRefreshToken(ctx, conditions)
+	_, err = business.redisStore.WLFindRefreshToken(ctx, conditions)
 	if err != nil {
 		return nil, common.ErrCannotGetEntity("RedisToken", err)
 	}
@@ -72,12 +72,12 @@ func (business *renewTokenRepo) RenewAccessToken(ctx context.Context, data *user
 		return nil, common.ErrInternal(err)
 	}
 
-	_ = business.redisStore.DelTokens(ctx,
+	_ = business.redisStore.WLDelTokens(ctx,
 		map[string]interface{}{"id": refreshPayload.UserId(),
 			common.KeyRedisAccessToken:  data.AccessToken,
 			common.KeyRedisRefreshToken: data.Refreshtoken})
 
-	err = business.redisStore.SaveTokens(ctx,
+	err = business.redisStore.WLSaveTokens(ctx,
 		map[string]interface{}{"id": refreshPayload.UserId(),
 			common.KeyRedisAccessToken:  accessToken,
 			common.KeyRedisRefreshToken: refreshToken})

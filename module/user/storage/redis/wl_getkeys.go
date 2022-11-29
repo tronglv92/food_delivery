@@ -3,16 +3,15 @@ package userstore
 import (
 	"context"
 	"fmt"
+	"food_delivery/common"
 )
 
-
-
-func (c *authUserCached) GetKeys(ctx context.Context, conditions map[string]interface{}) ([]string, error) {
+func (c *authUserCached) WLGetKeys(ctx context.Context, conditions map[string]interface{}) ([]string, error) {
 
 	var results []string
 	userId := conditions["id"].(int)
 
-	key := fmt.Sprintf(cachePrefixAT, userId)
+	key := fmt.Sprintf(common.CacheWLPrefixAT, userId)
 
 	var cursor uint64
 	for {

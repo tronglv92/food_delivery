@@ -3,18 +3,17 @@ package userstore
 import (
 	"context"
 	"fmt"
+	"food_delivery/common"
 	usermodel "food_delivery/module/user/model"
 
 	"time"
 )
 
-
-
 func (c *authUserCached) FindUser(ctx context.Context, conditions map[string]interface{}, moreInfo ...string) (*usermodel.User, error) {
 	var user usermodel.User
 
 	userId := conditions["id"].(int)
-	key := fmt.Sprintf(cacheKey, userId)
+	key := fmt.Sprintf(common.CacheKey, userId)
 
 	_ = c.cacheStore.Get(ctx, key, &user)
 

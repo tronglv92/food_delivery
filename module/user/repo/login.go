@@ -20,7 +20,7 @@ type SessionStorage interface {
 	CreateSession(ctx context.Context, data *sessionmodel.SessionCreate) error
 }
 type RedisUserStorage interface {
-	SaveTokens(ctx context.Context,
+	WLSaveTokens(ctx context.Context,
 		conditions map[string]interface{},
 		moreInfo ...string) error
 }
@@ -93,7 +93,8 @@ func (repo *loginRepo) Login(ctx context.Context, userAgent string, clientIp str
 
 	account := usermodel.NewAccount(&accessToken, &refreshToken)
 
-	_ = repo.storeRedis.SaveTokens(ctx, map[string]interface{}{
+	_ = repo.storeRedis.WLSaveTokens(ctx, map[string]interface{}{
+
 		"id":                        user.Id,
 		common.KeyRedisAccessToken:  accessToken,
 		common.KeyRedisRefreshToken: refreshToken})

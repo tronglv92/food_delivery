@@ -45,6 +45,10 @@ const (
 	RefreshTokenDuration = 3 * time.Minute // 30 days
 	KeyRedisAccessToken  = "access_token"
 	KeyRedisRefreshToken = "refresh_token"
+	CacheKey             = "user:%d"
+	CacheWLKeyAT         = "wl_user:%d:at:%v"
+	CacheWLKeyRT         = "wl_user:%d:rt:%v"
+	CacheWLPrefixAT      = "wl_user:%d:*"
 )
 
 // const (

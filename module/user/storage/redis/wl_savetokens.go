@@ -8,17 +8,15 @@ import (
 	"time"
 )
 
-
-
-func (c *authUserCached) SaveTokens(ctx context.Context,
+func (c *authUserCached) WLSaveTokens(ctx context.Context,
 	conditions map[string]interface{},
 	moreInfo ...string) error {
 	userId := conditions["id"].(int)
 	accessToken := conditions[common.KeyRedisAccessToken].(tokenprovider.Token)
 	refreshToken := conditions[common.KeyRedisRefreshToken].(tokenprovider.Token)
-	keyAT := fmt.Sprintf(cacheKeyAT, userId, accessToken.GetToken())
+	keyAT := fmt.Sprintf(common.CacheWLKeyAT, userId, accessToken.GetToken())
 
-	keyRT := fmt.Sprintf(cacheKeyRT, userId, refreshToken.GetToken())
+	keyRT := fmt.Sprintf(common.CacheWLKeyRT, userId, refreshToken.GetToken())
 
 	redisAccessToken := common.RedisToken{
 		Token:   accessToken.GetToken(),
