@@ -1,68 +1,64 @@
-package restful
+package remoterestful
 
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"food_delivery/common"
-	"food_delivery/plugin/go-sdk/logger"
 	"log"
-
-	"github.com/go-resty/resty/v2"
 )
 
-func NewUserService() *userService { return &userService{} }
+// func NewUserService() *userService { return &userService{} }
 
-type userService struct {
-	client     *resty.Client
-	serviceURL string
-	logger     logger.Logger
-}
+// type userService struct {
+// 	client     *resty.Client
+// 	serviceURL string
+// 	logger     logger.Logger
+// }
 
-func (*userService) GetPrefix() string {
-	return common.PluginUserService
-}
+// func (*userService) GetPrefix() string {
+// 	return common.PluginUserService
+// }
 
-func (s *userService) Get() interface{} {
-	return s
-}
+// func (s *userService) Get() interface{} {
+// 	return s
+// }
 
-func (userService) Name() string {
-	return common.PluginUserService
-}
+// func (userService) Name() string {
+// 	return common.PluginUserService
+// }
 
-func (s *userService) InitFlags() {
-	flag.StringVar(&s.serviceURL, s.GetPrefix()+"-url", "", "URL of user service (Ex: http://user-service:8080)")
-}
+// func (s *userService) InitFlags() {
+// 	flag.StringVar(&s.serviceURL, s.GetPrefix()+"-url", "", "URL of user service (Ex: http://user-service:8080)")
+// }
 
-func (s *userService) Configure() error {
-	s.client = resty.New()
-	s.logger = logger.GetCurrent().GetLogger(s.GetPrefix())
+// func (s *userService) Configure() error {
+// 	s.client = resty.New()
+// 	s.logger = logger.GetCurrent().GetLogger(s.GetPrefix())
 
-	if s.serviceURL == "" {
-		s.logger.Errorln("Missing service URL")
-		return errors.New("missing service URL")
-	}
+// 	if s.serviceURL == "" {
+// 		s.logger.Errorln("Missing service URL")
+// 		return errors.New("missing service URL")
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
-func (s *userService) Run() error {
-	return s.Configure()
-}
+// func (s *userService) Run() error {
+// 	return s.Configure()
+// }
 
-func (s *userService) Stop() <-chan bool {
-	c := make(chan bool)
+// func (s *userService) Stop() <-chan bool {
+// 	c := make(chan bool)
 
-	go func() {
-		c <- true
-		s.logger.Infoln("Stopped")
-	}()
-	return c
-}
+// 	go func() {
+// 		c <- true
+// 		s.logger.Infoln("Stopped")
+// 	}()
+// 	return c
+// }
 
-func (s *userService) GetUsers(ctx context.Context, ids []int) ([]common.SimpleUser, error) {
+func (s *userRestfulStore) GetUsers(ctx context.Context, ids []int) ([]common.SimpleUser, error) {
 	type requestUserParam struct {
 		Ids []int `json:"ids"`
 	}

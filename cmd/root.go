@@ -5,13 +5,17 @@ import (
 	handlers "food_delivery/cmd/handler"
 	"food_delivery/common"
 	"food_delivery/middleware"
+	"food_delivery/plugin/asynjobserver"
+	asynqclient "food_delivery/plugin/asynqclient"
 	"food_delivery/plugin/aws"
 	grpcService "food_delivery/plugin/client_remotecall/grpc"
 	appgrpcDeviceToken "food_delivery/plugin/client_remotecall/grpc/devicetoken"
 	appgrpcUser "food_delivery/plugin/client_remotecall/grpc/user"
-	"food_delivery/plugin/client_remotecall/restful"
 	"food_delivery/plugin/fcm"
+	loginApple "food_delivery/plugin/loginapple"
 	rabbitmq "food_delivery/plugin/pubsub/rabbitmq"
+	resty "food_delivery/plugin/resty"
+	"food_delivery/skio"
 
 	fcmGrpcServer "food_delivery/module/devicetoken/biz/grpcservice"
 	devicetokenstorage "food_delivery/module/devicetoken/storage/gorm"
@@ -46,7 +50,8 @@ func newService() goservice.Service {
 		goservice.WithInitRunnable(sdkgorm.NewGormDB("main", common.DBMain)),
 		goservice.WithInitRunnable(sdkmgo.NewMongoDB("mongoDB", common.DBMongo)),
 		goservice.WithInitRunnable(jwt.NewTokenJWTProvider(common.JWTProvider)),
-		goservice.WithInitRunnable(restful.NewUserService()),
+		// goservice.WithInitRunnable(restful.NewUserService()),
+		goservice.WithInitRunnable(resty.NewRestService()),
 		// goservice.WithInitRunnable(pblocal.NewPubSub(common.PluginPubSub)),
 		// goservice.WithInitRunnable(appnats.NewNATS(common.PluginNATS)),
 		goservice.WithInitRunnable(sdkredis.NewRedisDB("redis", common.PluginRedis)),
@@ -58,6 +63,9 @@ func newService() goservice.Service {
 		goservice.WithInitRunnable(grpcService.NewGRPCServer(common.PluginGrpcServer)),
 		goservice.WithInitRunnable(appgrpcUser.NewUserClient(common.PluginGrpcUserClient)),
 		goservice.WithInitRunnable(appgrpcDeviceToken.NewDeviceTokenClient(common.PluginGrpcDeviceTokenClient)),
+		goservice.WithInitRunnable(asynqclient.NewAsynqClient(common.PluginAsynqClient)),
+		goservice.WithInitRunnable(asynjobserver.NewAsynqServer(common.PluginAsynqServer)),
+		goservice.WithInitRunnable(loginApple.NewLoginApple(common.PluginLoginApple)),
 	)
 
 	return service
@@ -84,12 +92,18 @@ var rootCmd = &cobra.Command{
 
 		// appContext := appctx.NewAppContext(db, s3Provider, secretKey, ps)
 		service.HTTPServer().AddHandler(func(engine *gin.Engine) {
+
 			engine.Use(middleware.Recover())
 			engine.GET("/ping", func(ctx *gin.Context) {
 				ctx.JSON(http.StatusOK, gin.H{"data": "pong"})
 			})
 			handlers.MainRoute(engine, service)
 			handlers.InternalRoute(engine, service)
+
+			engine.StaticFile("/demo/", "./demo.html")
+			rtEngine := skio.NewEngine()
+			_ = rtEngine.Run(engine, service)
+
 		})
 
 		if err := service.Start(); err != nil {
@@ -106,6 +120,7 @@ func Execute() {
 	rootCmd.AddCommand(startSubUserLikedRestaurantCmd)
 	rootCmd.AddCommand(startSubUserDislikedRestaurantCmd)
 	rootCmd.AddCommand(startSubSendNotificationCmd)
+	rootCmd.AddCommand(startSubEmailCmd)
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

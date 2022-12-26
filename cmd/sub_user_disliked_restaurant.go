@@ -17,6 +17,7 @@ var startSubUserDislikedRestaurantCmd = &cobra.Command{
 	Short: "Start a subscriber when user disliked restaurant",
 	Run: func(cmd *cobra.Command, args []string) {
 		service := goservice.New(
+		
 			goservice.WithInitRunnable(sdkgorm.NewGormDB("main", common.DBMain)),
 			goservice.WithInitRunnable(rabbitmq.NewRabbitMQ(common.PluginRabbitMQ)),
 		)

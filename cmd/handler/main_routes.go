@@ -5,6 +5,7 @@ import (
 	"food_delivery/middleware"
 	"food_delivery/module/restaurant/transport/ginrestaurant"
 	"food_delivery/module/restaurantlike/transport/ginrstlike"
+	ginsendjob "food_delivery/module/sendtask/transport"
 	"food_delivery/module/upload/uploadtransport/ginupload"
 	userstoragegorm "food_delivery/module/user/storage/gorm"
 	userstorageredis "food_delivery/module/user/storage/redis"
@@ -39,11 +40,15 @@ func MainRoute(router *gin.Engine, sc goservice.ServiceContext) {
 
 		v1.POST("/register", usergin.Register(sc))
 		v1.POST("/auth", usergin.Login(sc))
+		v1.POST("/login-google", usergin.LoginGoogle(sc))
+		v1.POST("/login-facebook", usergin.LoginFacebook(sc))
+		v1.POST("/login-apple", usergin.LoginApple(sc))
 		v1.POST("/renew-token", usergin.RenewAccessToken(sc))
 		v1.GET("/profile", middleware.RequiredAuth(sc, userStore), usergin.Profile(sc))
 		v1.POST("/upload", middleware.RequiredAuth(sc, userStore), ginupload.Upload(sc))
 		v1.POST("/put-device-token", middleware.RequiredAuth(sc, userStore), gindevicetoken.PutDeviceToken(sc))
 		v1.POST("/remove-token-by-user/:id", usergin.RemoveRedisToken(sc))
+
 		restaurants := v1.Group("/restaurants")
 		{
 			restaurants.POST("", middleware.RequiredAuth(sc, userStore), ginrestaurant.CreateRestaurant(sc))
@@ -57,5 +62,7 @@ func MainRoute(router *gin.Engine, sc goservice.ServiceContext) {
 			restaurants.DELETE("/:id/dislike", middleware.RequiredAuth(sc, userStore), ginrstlike.UserDislikeRestaurant(sc))
 			restaurants.GET("/:id/like", middleware.RequiredAuth(sc, userStore), ginrstlike.ListUser(sc))
 		}
+
+		v1.GET("/send-job-mail", ginsendjob.SendEmail(sc))
 	}
 }

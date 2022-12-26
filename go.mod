@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/ClickHouse/clickhouse-go v1.5.4
 	github.com/NaySoftware/go-fcm v0.0.0-20190516140123-808e978ddcd2
+	github.com/Timothylock/go-signin-with-apple v0.0.0-20221018051840-f7d0bffd758f
 	github.com/aws/aws-sdk-go v1.44.116
 	github.com/btcsuite/btcutil v1.0.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -14,9 +15,10 @@ require (
 	github.com/go-redis/redis/v7 v7.4.1
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-resty/resty/v2 v2.7.0
-	github.com/google/uuid v1.1.2
+	github.com/google/uuid v1.2.0
 	github.com/googollee/go-socket.io v1.6.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.13.0
+	github.com/hibiken/asynq v0.23.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/nats-io/nats.go v1.19.0
 	github.com/olivere/elastic/v7 v7.0.8
@@ -42,6 +44,7 @@ require (
 	github.com/facebookgo/ensure v0.0.0-20200202191622-63f1cf65ac4c // indirect
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4 // indirect
+	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/hashicorp/golang-lru v0.5.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
@@ -62,6 +65,10 @@ require (
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
+	github.com/spf13/cast v1.3.1 // indirect
+	github.com/tideland/golib v4.24.2+incompatible // indirect
+	github.com/tideland/gorest v2.15.5+incompatible // indirect
 	github.com/vmihailenco/bufpool v0.1.11 // indirect
 	github.com/vmihailenco/go-tinylfu v0.2.2 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.4 // indirect

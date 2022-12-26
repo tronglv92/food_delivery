@@ -5,24 +5,20 @@ import (
 
 	"sync"
 
+	goservice "food_delivery/plugin/go-sdk"
+
 	"github.com/gin-gonic/gin"
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/googollee/go-socket.io/engineio"
 	"github.com/googollee/go-socket.io/engineio/transport"
 	"github.com/googollee/go-socket.io/engineio/transport/websocket"
-	"gorm.io/gorm"
 )
 
-type AppContext interface {
-	GetMainDBConnection() *gorm.DB
-	SecretKey() string
-	GetRealtimeEngine() RealtimeEngine
-}
 type RealtimeEngine interface {
 	UserSockets(userId int) []AppSocket
 	EmitToRoom(room string, key string, data interface{}) error
 	EmitToUser(userId int, key string, data interface{}) error
-	Run(ctx AppContext, engine *gin.Engine) error
+	Run(engine *gin.Engine) error
 }
 
 type rtEngine struct {
@@ -89,7 +85,7 @@ func (engine *rtEngine) EmitToUser(userId int, key string, data interface{}) err
 
 	return nil
 }
-func (engine *rtEngine) Run(appCtx AppContext, r *gin.Engine) error {
+func (engine *rtEngine) Run(r *gin.Engine, sc goservice.ServiceContext) error {
 	server := socketio.NewServer(&engineio.Options{
 		Transports: []transport.Transport{websocket.Default},
 	})

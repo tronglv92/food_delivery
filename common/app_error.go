@@ -135,5 +135,12 @@ func ErrNoPermission(err error) *AppError {
 		fmt.Sprintf("ErrNoPermission"),
 	)
 }
+func ErrLoginNotValid(err error) *AppError {
+	return NewCustomError(
+		err,
+		fmt.Sprintf("Email and Password not valid"),
+		fmt.Sprintf("ErrLoginNotValid"),
+	)
+}
 
 var ErrRecordNotFound = errors.New("record not found")

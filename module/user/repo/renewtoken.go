@@ -8,6 +8,7 @@ import (
 
 	usermodel "food_delivery/module/user/model"
 
+	"food_delivery/plugin/go-sdk/logger"
 	"food_delivery/plugin/tokenprovider"
 )
 
@@ -21,9 +22,17 @@ type RedisTokenStorage interface {
 	WLSaveTokens(ctx context.Context,
 		conditions map[string]interface{},
 		moreInfo ...string) error
+	BLSaveTokens(ctx context.Context,
+		conditions map[string]interface{},
+		moreInfo ...string) error
+	BLFindTokens(ctx context.Context,
+		conditions map[string]interface{},
+		moreInfo ...string) bool
 	WLDelTokens(ctx context.Context,
 		conditions map[string]interface{},
 		moreInfo ...string) error
+	WLGetKeys(ctx context.Context, conditions map[string]interface{}) ([]string, error)
+	WLDelKeys(ctx context.Context, keys []string) error
 }
 type renewTokenRepo struct {
 	// appCtx        appctx.AppContext
@@ -47,11 +56,28 @@ func NewRenewTokenRepo(redisStore RedisTokenStorage,
 	}
 }
 func (business *renewTokenRepo) RenewAccessToken(ctx context.Context, data *usermodel.RenewAccessTokenRequest) (*usermodel.Account, error) {
-
+	logger := logger.GetCurrent().GetLogger("module.user.repo.renewtoken")
 	refreshPayload, err := business.tokenProvider.Validate(data.Refreshtoken)
 	if err != nil {
 		return nil, common.ErrInvalidRequest(err)
 	}
+
+	isBlacklist := business.redisStore.BLFindTokens(ctx,
+		map[string]interface{}{"id": refreshPayload.UserId(),
+			common.KeyRedisRefreshToken: data.Refreshtoken})
+	logger.Debugf("isBlacklist %v", isBlacklist)
+	if isBlacklist {
+		// return nil,
+		logger.Debugf("vao trong 1")
+		keys, _ := business.redisStore.WLGetKeys(ctx, map[string]interface{}{"id": refreshPayload.UserId()})
+		if keys != nil {
+			logger.Debugf("vao trong 2")
+			_ = business.redisStore.WLDelKeys(ctx, keys)
+		}
+		return nil, common.NewCusUnauthorizedError(nil, "Token invalid", "ErrTokenInvalid")
+
+	}
+
 	conditions := map[string]interface{}{"id": refreshPayload.UserId(), common.KeyRedisRefreshToken: data.Refreshtoken}
 	_, err = business.redisStore.WLFindRefreshToken(ctx, conditions)
 	if err != nil {
@@ -63,30 +89,42 @@ func (business *renewTokenRepo) RenewAccessToken(ctx context.Context, data *user
 		URole:   refreshPayload.Role(),
 		TokenID: refreshPayload.ID(),
 	}
-	accessToken, err := business.tokenProvider.Generate(payload, business.accessTokenExpiry)
+	accessTokenPayload, err := business.tokenProvider.Generate(payload, business.accessTokenExpiry)
 	if err != nil {
 		return nil, common.ErrInternal(err)
 	}
-	refreshToken, err := business.tokenProvider.Generate(payload, business.refreshTokenExpiry)
+	refreshTokenPayload, err := business.tokenProvider.Generate(payload, business.refreshTokenExpiry)
 	if err != nil {
 		return nil, common.ErrInternal(err)
 	}
 
+	// delete tokens whitelist
 	_ = business.redisStore.WLDelTokens(ctx,
 		map[string]interface{}{"id": refreshPayload.UserId(),
 			common.KeyRedisAccessToken:  data.AccessToken,
 			common.KeyRedisRefreshToken: data.Refreshtoken})
 
+	// save blacklist token
+
+	err = business.redisStore.BLSaveTokens(ctx,
+		map[string]interface{}{"id": refreshPayload.UserId(),
+			common.KeyRedisAccessToken:  data.AccessToken,
+			common.KeyRedisRefreshToken: data.Refreshtoken})
+	if err != nil {
+		return nil, common.ErrInternal(err)
+	}
+	// save whitelist new token
+
 	err = business.redisStore.WLSaveTokens(ctx,
 		map[string]interface{}{"id": refreshPayload.UserId(),
-			common.KeyRedisAccessToken:  accessToken,
-			common.KeyRedisRefreshToken: refreshToken})
+			common.KeyRedisAccessToken:  accessTokenPayload,
+			common.KeyRedisRefreshToken: refreshTokenPayload})
 
 	if err != nil {
 		return nil, common.ErrInternal(err)
 	}
 
-	account := usermodel.NewAccount(&accessToken, &refreshToken)
+	account := usermodel.NewAccount(&accessTokenPayload, &refreshTokenPayload)
 	return account, nil
 
 }

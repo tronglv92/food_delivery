@@ -4,6 +4,7 @@ import (
 	"context"
 	"food_delivery/common"
 	restaurantmodel "food_delivery/module/restaurant/model"
+	"food_delivery/plugin/go-sdk/logger"
 )
 
 type ListRestaurantRepo interface {
@@ -33,13 +34,13 @@ func (repo *listRestaurantRepo) ListRestaurant(
 	filter *restaurantmodel.Filter,
 	paging *common.Paging,
 ) ([]restaurantmodel.Restaurant, error) {
-	// logger := logger.GetCurrent().GetLogger("restaurant.repo.list_restaurant")
+	logger := logger.GetCurrent().GetLogger("restaurant.repo.list_restaurant")
 	// result, err := repo.store.ListDataWithCondition(ctx, filter, paging, "User")
 	result, err := repo.store.ListDataWithCondition(ctx, filter, paging)
 	if err != nil {
 		return nil, err
 	}
-	// logger.Debugf("vao trong nay", result)
+	logger.Debugf("vao trong nay", result)
 	// fmt.Println("restaurant.repo.list_restaurant: ", result)
 	userIds := make([]int, len(result))
 

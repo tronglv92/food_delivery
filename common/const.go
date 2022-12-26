@@ -18,6 +18,7 @@ const (
 	DBMain                      = "mysql"
 	DBMongo                     = "mongo"
 	PluginUserService           = "user-service"
+	PluginRestService           = "rest-service"
 	JWTProvider                 = "jwt"
 	PluginPubSub                = "pubsub"
 	PluginNATS                  = "nats"
@@ -27,8 +28,12 @@ const (
 	PluginGrpcUserClient        = "grpc-user-client"
 	PluginGrpcDeviceTokenClient = "grpc-devicetoken-client"
 	PluginAWS                   = "aws"
+	PluginLoginApple                   = "apple"
 	PluginFCM                   = "fcm"
 	PluginRabbitMQ              = "rabbitmq"
+
+	PluginAsynqClient = "asynq-client"
+	PluginAsynqServer = "asynq-server"
 
 	TopicUserLikeRestaurant    = "restaurant.liked"
 	TopicUserDislikeRestaurant = "restaurant.disliked"
@@ -41,14 +46,29 @@ const (
 )
 
 const (
-	AccessTokenDuration  = 1 * time.Hour   // 1 h
-	RefreshTokenDuration = 3 * time.Minute // 30 days
+	AccessTokenDuration    = 1 * time.Hour   // 1 h
+	RefreshTokenDuration   = 3 * time.Minute // 30 days
+	AddedBlackListDuration = 4 * time.Hour
+
 	KeyRedisAccessToken  = "access_token"
 	KeyRedisRefreshToken = "refresh_token"
 	CacheKey             = "user:%d"
 	CacheWLKeyAT         = "wl_user:%d:at:%v"
 	CacheWLKeyRT         = "wl_user:%d:rt:%v"
 	CacheWLPrefixAT      = "wl_user:%d:*"
+
+	CacheBLKeyAT = "bl_user:%d:at:%v"
+	CacheBLKeyRT = "bl_user:%d:rt:%v"
+)
+const (
+	UserServiceUrl      = "http://localhost:3000"
+	OauthGoogleUrlAPI   = "https://www.googleapis.com/oauth2/v2/userinfo?access_token="
+	OauthFacebookUrlAPI = "https://graph.facebook.com/v13.0/me?fields=id,name,email,picture&access_token&access_token="
+	PasswordGoogle      = "gg_%v"
+	PasswordFacebok     = "fb_%v"
+	PasswordApple       = "apple_%v"
+	RoleUser            = "user"
+	RoleAdmin           = "admin"
 )
 
 // const (

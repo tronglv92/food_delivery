@@ -1,7 +1,6 @@
 package ginrestaurant
 
 import (
-	"context"
 	"food_delivery/common"
 	restaurantbiz "food_delivery/module/restaurant/biz"
 	restaurantmodel "food_delivery/module/restaurant/model"
@@ -10,9 +9,11 @@ import (
 	restaurantstorage "food_delivery/module/restaurant/storage/gorm"
 	"net/http"
 
+	remoterestful "food_delivery/plugin/client_remotecall/restful"
 	goservice "food_delivery/plugin/go-sdk"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-resty/resty/v2"
 	"github.com/olivere/elastic/v7"
 	"gorm.io/gorm"
 )
@@ -46,9 +47,11 @@ func ListRestaurant(sc goservice.ServiceContext) gin.HandlerFunc {
 		//userStore := userstorage.NewSQLStore(db)
 		//userStore := restaurantapi.NewUserApi("http://localhost:4001")
 
-		userService := sc.MustGet(common.PluginGrpcUserClient).(interface {
-			GetUsers(ctx context.Context, ids []int) ([]common.SimpleUser, error)
-		})
+		// userService := sc.MustGet(common.PluginGrpcUserClient).(interface {
+		// 	GetUsers(ctx context.Context, ids []int) ([]common.SimpleUser, error)
+		// })
+		clientRest := sc.MustGet(common.PluginRestService).(*resty.Client)
+		userService := remoterestful.NewUserRestfulStore(clientRest, common.UserServiceUrl)
 
 		repo := restaurantrepo.NewListRestaurantRepo(esStore, userService)
 		biz := restaurantbiz.NewListRestaurantBiz(repo)
